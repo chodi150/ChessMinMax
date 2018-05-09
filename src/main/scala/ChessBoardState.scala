@@ -13,7 +13,7 @@ class ChessBoardState(val playerOnePositions : Set[Position],
 
   def makeMove(p1: Position, p2: Position): ChessBoardState = {
     if (isPlayerOneMove) {
-      val p = playerTwoPositions.toStream.find(p => p.row == p2.row && p.col == p2.col).orNull
+      val p = playerTwoPositions.toStream.find(p => p.equalCoords(p2)).orNull
       if (p != null) {
         new ChessBoardState(playerOnePositions - p1 + p2, playerTwoPositions - p, availablePositions + Position(p1.row, p1.col, 0), false)
       }
@@ -22,7 +22,7 @@ class ChessBoardState(val playerOnePositions : Set[Position],
       }
     }
     else {
-      val p = playerOnePositions.toStream.find(p => p.row == p2.row && p.col == p2.col).orNull
+      val p = playerOnePositions.toStream.find(p => p.equalCoords(p2)).orNull
       if (p != null) {
         new ChessBoardState(playerOnePositions - p, playerTwoPositions - p1 + p2, availablePositions + Position(p1.row, p1.col, 0), true)
       }
@@ -37,4 +37,14 @@ class ChessBoardState(val playerOnePositions : Set[Position],
       val chessBoardSort = collection.immutable.SortedSet[Position]() ++ chessBoard
       chessBoardSort.grouped(8).foreach(x => {x.foreach(y=>print(y.figure+" ")); println("")})
     }
+
+//  def generateStatesForPawn(position: Position, chessBoardState: ChessBoardState, isPlayerOneMove: Boolean) : Set[ChessBoardState] = {
+//    if(isPlayerOneMove){
+//
+//    }
+//    else{
+//
+//    }
+//  }
+
 }

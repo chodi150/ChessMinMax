@@ -14,5 +14,12 @@ case class Position(row: Int, col: Int, figure: Int) extends Ordered[Position]{
   override def hashCode(): Int = {
     (row,col).hashCode()
   }
+
+  def equalCoords(position: Position): Boolean = {
+    if(this.compare(position)==0)
+      true
+    else
+      false
+  }
 }
 
