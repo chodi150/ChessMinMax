@@ -27,22 +27,37 @@ class ChessBoardState(val playerOnePositions : Set[Position],
     }
 
   def generateStatesForKing(position: Position) : Set[ChessBoardState] = {
-    val pseudoPossibleMoves = Range(position.row - 1, position.row + 2)
-      .flatMap(x => Range(position.col - 1, position.col + 2)
-        .map(y => Position(x, y, 6))).filter(x => x != position && x.positionOnBoard()).toSet
-      val possibleMoves = pseudoPossibleMoves -- playerOnePositions
+    val possibleMoves: Set[Position] = generatePositionsForKing(position)
       possibleMoves.map(x => makeMove(position, x))
 
   }
 
+  def generatePositionsForKing(position: Position): Set[Position] = {
+    val pseudoPossibleMoves = Range(position.row - 1, position.row + 2)
+      .flatMap(x => Range(position.col - 1, position.col + 2)
+        .map(y => Position(x, y, 6))).filter(x => x != position && x.positionOnBoard()).toSet
+    val possibleMoves = pseudoPossibleMoves -- playerOnePositions
+    possibleMoves
+  }
+
   def generateStatesForBishop(position: Position) : Set[ChessBoardState] = {
-    val bishopMoves = tryToMoveInDirection(position,1,1) ++ tryToMoveInDirection(position,1,-1) ++ tryToMoveInDirection(position,-1,1) ++ tryToMoveInDirection(position,-1,-1)
+    val bishopMoves = generatePositionsForBishop(position)
     bishopMoves.map(x=>makeMove(position,x))
   }
+
+  def generatePositionsForBishop(position: Position): Set[Position] = {
+    tryToMoveInDirection(position, 1, 1) ++ tryToMoveInDirection(position, 1, -1) ++ tryToMoveInDirection(position, -1, 1) ++ tryToMoveInDirection(position, -1, -1)
+  }
+
   def generateStatesForRook(position: Position) : Set[ChessBoardState] = {
-    val rookMoves = tryToMoveInDirection(position,0,1) ++ tryToMoveInDirection(position,1,0) ++ tryToMoveInDirection(position,0,-1) ++ tryToMoveInDirection(position,-1,0)
+    val rookMoves = generatePositionsForRook(position)
     rookMoves.map(x=>makeMove(position,x))
   }
+
+  def generatePositionsForRook(position: Position): Set[Position] = {
+    tryToMoveInDirection(position, 0, 1) ++ tryToMoveInDirection(position, 1, 0) ++ tryToMoveInDirection(position, 0, -1) ++ tryToMoveInDirection(position, -1, 0)
+  }
+
   def generateStatesForQueen(position: Position) : Set[ChessBoardState] = {
     generateStatesForBishop(position) ++ generateStatesForRook(position)
   }
@@ -71,18 +86,23 @@ class ChessBoardState(val playerOnePositions : Set[Position],
     }
 
     def generateStatesForHorse(position: Position) : Set[ChessBoardState] = {
-      val horseMove1 = Position(position.row+2, position.col+1, position.figure)
-      val horseMove2 = Position(position.row+2, position.col-1, position.figure)
-      val horseMove3 = Position(position.row-2, position.col+1, position.figure)
-      val horseMove4 = Position(position.row-2, position.col-1, position.figure)
-      val horseMove5 = Position(position.row+1, position.col+2, position.figure)
-      val horseMove6 = Position(position.row+1, position.col-2, position.figure)
-      val horseMove7 = Position(position.row-1, position.col+2, position.figure)
-      val horseMove8 = Position(position.row-1, position.col-2, position.figure)
-      val pseudoPossibleMoves = Set(horseMove1,horseMove2,horseMove3, horseMove4, horseMove5, horseMove6, horseMove6, horseMove7, horseMove8)
-      val possibleMoves = pseudoPossibleMoves.toStream.filter(p=> availablePositions(p) || playerTwoPositions(p)).toSet
+      val possibleMoves: Set[Position] = generatePositionsForHorse(position)
       possibleMoves.map(p => makeMove(position,p))
     }
+
+  def generatePositionsForHorse(position: Position): Set[Position] = {
+    val horseMove1 = Position(position.row + 2, position.col + 1, position.figure)
+    val horseMove2 = Position(position.row + 2, position.col - 1, position.figure)
+    val horseMove3 = Position(position.row - 2, position.col + 1, position.figure)
+    val horseMove4 = Position(position.row - 2, position.col - 1, position.figure)
+    val horseMove5 = Position(position.row + 1, position.col + 2, position.figure)
+    val horseMove6 = Position(position.row + 1, position.col - 2, position.figure)
+    val horseMove7 = Position(position.row - 1, position.col + 2, position.figure)
+    val horseMove8 = Position(position.row - 1, position.col - 2, position.figure)
+    val pseudoPossibleMoves = Set(horseMove1, horseMove2, horseMove3, horseMove4, horseMove5, horseMove6, horseMove6, horseMove7, horseMove8)
+    val possibleMoves = pseudoPossibleMoves.toStream.filter(p => availablePositions(p) || playerTwoPositions(p)).toSet
+    possibleMoves
+  }
 
   def generateStatesForPosition(position: Position) : Set[ChessBoardState] =  position.figure match {
       case 1 => generateStatesForPawn(position)
