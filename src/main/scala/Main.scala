@@ -30,16 +30,16 @@ object Main extends App{
     val king = Position(7,4,6)
     pawns + rook1 + rook2 + horse1 + horse2 + bishop1 + bishop2 + queen + king
   }
-  val chessBoardState1 = new ChessBoardState(initPlayerOnePositions(),initPlayerTwoPositions(),initAvailablePositions(),true)
-//  val chessBoardState = chessBoardState1.makeMove(Position(1,2,1), Position(2,2,1))
-//  val chessBoardState2 = chessBoardState.makeMove(Position(6,4,1), Position(3,4,1))
+  val chessBoardState1 = new ChessBoardState(initPlayerOnePositions(),initPlayerTwoPositions(),initAvailablePositions())
+//  val chessBoardState = chessBoardState1.makeMove(Position(1,1,1), Position(5,1,1))
+//  val chessBoardState2 = chessBoardState.makeMove(Position(1,4,1), Position(2,4,1))
 //  val chessBoardState3 = chessBoardState2.makeMove(Position(0,4,6), Position(7,4,6))
 //  chessBoardState3.display()
 //  print(chessBoardState3.isGameOver)
 
-  val p = Position(0,1,2)
+  val p = Position(0,1,6)
 
-  print(chessBoardState1.generateStatesForBishop(p).size)
+  print(chessBoardState1.generateStatesForPosition(p).size)
 
 }
 
