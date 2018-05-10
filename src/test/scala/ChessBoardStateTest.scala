@@ -4,6 +4,7 @@ import org.scalatest.FunSuite
 
 class ChessBoardStateTest extends FunSuite {
 
+  val initialStateOfGame = new ChessBoardState(initPlayerOnePositions(),initPlayerTwoPositions(),initAvailablePositions())
   test("testGenerateStatesForPositionForPawn1") {
     val chessBoardState = new ChessBoardState(initPlayerOnePositions(),initPlayerTwoPositions(),initAvailablePositions())
     val p = Position(1,1,1)
