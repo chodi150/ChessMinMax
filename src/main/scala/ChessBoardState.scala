@@ -85,7 +85,7 @@ class ChessBoardState(val playerOnePositions : Set[Position],
     generateStatesForBishop(position) ++ generateStatesForRook(position)
   }
   def tryToMoveInDirection(position: Position, colMove : Int, rowMove : Int) : Set[Position] = {
-    val newPosition=Position(position.row+1, position.col+1, position.figure)
+    val newPosition=Position(position.row+colMove, position.col+rowMove, position.figure)
     if(!newPosition.positionOnBoard())
       return Set()
     val playerTwoExists = playerTwoPositions.toStream.exists(p => p.equalCoords(newPosition))
