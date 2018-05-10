@@ -155,4 +155,12 @@ class ChessBoardStateTest extends FunSuite {
     assert(moves.size == 8)
   }
 
+  test("Initial state has score of 0") {
+    assert(initialStateOfGame.countScoreForChessState(true) == 0)
+  }
+
+  test("Initial state has score of 0 2") {
+    assert(initialStateOfGame.countScoreForChessState(false) == 0)
+  }
+
 }

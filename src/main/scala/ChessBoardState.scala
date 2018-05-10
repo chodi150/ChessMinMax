@@ -113,5 +113,45 @@ class ChessBoardState(val playerOnePositions : Set[Position],
       case 6 => generateStatesForKing(position)
     }
 
+  def countScoreForFigure(figure : Int): Int = figure match {
+    case 1 => 1
+    case 2 => 3
+    case 3 => 3
+    case 4 => 5
+    case 5 => 9
+    case 6 => 100
+  }
+
+  def countScoreForChessState(isMaximizingPlayer: Boolean) : Int = {
+    if(isMaximizingPlayer){
+      playerTwoPositions.map(p=>countScoreForFigure(p.figure)).sum - playerOnePositions.map(p=>countScoreForFigure(p.figure)).sum
+    }
+    else{
+      playerOnePositions.map(p=>countScoreForFigure(p.figure)).sum - playerTwoPositions.map(p=>countScoreForFigure(p.figure)).sum
+    }
+  }
+
+  def minimax(isMaximizingPlayer : Boolean, depth:Int) : ChessBoardState = {
+    if (depth==0 || isGameOver) {
+      if (isMaximizingPlayer) {
+        playerOnePositions.flatMap(p => generateStatesForPosition(p)).reduceLeft((x, y) => if (x.countScoreForChessState(true) > y.countScoreForChessState(true)) x else y)
+      }
+      else {
+        playerOnePositions.flatMap(p => generateStatesForPosition(p)).reduceLeft((x, y) => if (x.countScoreForChessState(false) < y.countScoreForChessState(false)) x else y)
+      }
+    }
+    else{
+      if (isMaximizingPlayer) {
+        val possibleStates = playerOnePositions.flatMap(p => generateStatesForPosition(p)).map(x => x.minimax(false,depth-1))
+        possibleStates.reduceLeft((x, y) => if (x.countScoreForChessState(true) > y.countScoreForChessState(true)) x else y)
+      }
+      else {
+        val possibleStates = playerOnePositions.flatMap(p => generateStatesForPosition(p)).map(x => x.minimax(true,depth-1))
+        possibleStates.reduceLeft((x, y) => if (x.countScoreForChessState(false) < y.countScoreForChessState(false)) x else y)
+
+      }
+    }
+  }
+
 }
 

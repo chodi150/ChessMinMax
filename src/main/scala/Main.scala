@@ -39,7 +39,7 @@ object Main extends App{
 
   val p = Position(0,1,6)
 
-  print(chessBoardState1.generateStatesForPosition(p).size)
+  print(chessBoardState1.minimax(true,2).display())
 
 }
 
