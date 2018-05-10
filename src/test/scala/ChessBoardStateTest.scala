@@ -163,4 +163,9 @@ class ChessBoardStateTest extends FunSuite {
     assert(initialStateOfGame.countScoreForChessState(false) == 0)
   }
 
+  test("makeMove test1") {
+    val chessBoardState = new ChessBoardState(initPlayerOnePositions(),initPlayerTwoPositions(),initAvailablePositions())
+    val p = Position(0,3,5)
+  }
+
 }

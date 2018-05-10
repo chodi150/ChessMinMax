@@ -77,8 +77,8 @@ class ChessBoardState(val playerOnePositions : Set[Position],
 
 
     def generateStatesForPawn(position: Position) : Set[ChessBoardState] = {
-        val possiblePositions = Set.empty ++ availablePositions.toStream.find(p => p.equalCoords(Position(position.row + 1, position.col, 0))).toSet ++ playerTwoPositions.toStream.find(p => p.equalCoords(Position(position.row + 1, position.col+1, 0))).toSet ++ playerTwoPositions.toStream.find(p => p.equalCoords(Position(position.row + 1, position.col-1, 0))).toSet
-        possiblePositions.map(p => makeMove(position, p))
+        val possiblePositions = Set.empty ++ availablePositions.toStream.find(p => p.equalCoords(Position(position.row + 1, position.col, position.figure))).toSet ++ playerTwoPositions.toStream.find(p => p.equalCoords(Position(position.row + 1, position.col+1, position.figure))).toSet ++ playerTwoPositions.toStream.find(p => p.equalCoords(Position(position.row + 1, position.col-1, position.figure))).toSet
+        possiblePositions.map(p => makeMove(position, Position(p.row, p.col, position.figure)))
     }
 
     def reverseChessBoard(positions: Set[Position]) : Set[Position] = {
