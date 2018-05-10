@@ -11,15 +11,13 @@ case class Position(row: Int, col: Int, figure: Int) extends Ordered[Position]{
       -1
   }
 
-  override def hashCode(): Int = {
-    (row,col).hashCode()
-  }
+  override def equals(obj: scala.Any): Boolean = this.hashCode() == obj.hashCode()
 
-  def equalCoords(position: Position): Boolean = {
-    if(this.compare(position)==0)
-      true
-    else
-      false
-  }
+  override def hashCode(): Int = (row,col).hashCode()
+
+  def equalCoords(position: Position): Boolean = this.compare(position)==0
+
+
+  def positionOnBoard():Boolean = row<8 && row>=0 && col<8 && col>=0
 }
 

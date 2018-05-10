@@ -38,13 +38,39 @@ class ChessBoardState(val playerOnePositions : Set[Position],
       chessBoardSort.grouped(8).foreach(x => {x.foreach(y=>print(y.figure+" ")); println("")})
     }
 
-//  def generateStatesForPawn(position: Position, chessBoardState: ChessBoardState, isPlayerOneMove: Boolean) : Set[ChessBoardState] = {
-//    if(isPlayerOneMove){
-//
-//    }
-//    else{
-//
-//    }
-//  }
+  def generateStatesForKing(position: Position) : Set[ChessBoardState] = {
+    val pseudoPossibleMoves = Range(position.row - 1, position.row + 2)
+      .flatMap(x => Range(position.col - 1, position.col + 2)
+        .map(y => Position(x, y, 6))).filter(x => x != position && x.positionOnBoard()).toSet
+    if(isPlayerOneMove){
+      val possibleMoves = pseudoPossibleMoves -- playerOnePositions
+      possibleMoves.map(x => makeMove(position, x))
+    }
+    else{
+      val possibleMoves = pseudoPossibleMoves -- playerTwoPositions
+      possibleMoves.map(x => makeMove(position, x))
+    }
+  }
+
+  def generateStatesForBishop(position:Position) : Set[ChessBoardState] = {
+    val pseudoPossibleMovesRD = Range(1,8).map(x => Position(position.row + x, position.col+x, 3)).takeWhile(x => !playerOnePositions(x)).filter(x => x.positionOnBoard()).toSet
+    val movesBehindFirstEnemyRD = Range(1,8).map(x => Position(position.row + x, position.col+x, 3)).dropWhile(x => !playerTwoPositions(x)).drop(1).filter(x => x.positionOnBoard()).toSet
+    val possibleMovesRD = pseudoPossibleMovesRD -- movesBehindFirstEnemyRD
+
+    val pseudoPossibleMovesRU = Range(1,8).map(x => Position(position.row - x, position.col+x, 3)).takeWhile(x => !playerOnePositions(x)).filter(x => x.positionOnBoard()).toSet
+    val movesBehindFirstEnemyRU = Range(1,8).map(x => Position(position.row - x, position.col+x, 3)).dropWhile(x => !playerTwoPositions(x)).drop(1).filter(x => x.positionOnBoard()).toSet
+    val possibleMovesRU = pseudoPossibleMovesRU -- movesBehindFirstEnemyRU
+
+    val pseudoPossibleMovesLD = Range(1,8).map(x => Position(position.row + x, position.col-x, 3)).takeWhile(x => !playerOnePositions(x)).filter(x => x.positionOnBoard()).toSet
+    val movesBehindFirstEnemyLD = Range(1,8).map(x => Position(position.row + x, position.col-x, 3)).dropWhile(x => !playerTwoPositions(x)).drop(1).filter(x => x.positionOnBoard()).toSet
+    val possibleMovesLD = pseudoPossibleMovesRU -- movesBehindFirstEnemyRU
+
+    val pseudoPossibleMovesLU = Range(1,8).map(x => Position(position.row - x, position.col-x, 3)).takeWhile(x => !playerOnePositions(x)).filter(x => x.positionOnBoard()).toSet
+    val movesBehindFirstEnemyLU = Range(1,8).map(x => Position(position.row - x, position.col-x, 3)).dropWhile(x => !playerTwoPositions(x)).drop(1).filter(x => x.positionOnBoard()).toSet
+    val possibleMovesLU = pseudoPossibleMovesRU -- movesBehindFirstEnemyRU
+
+    (possibleMovesLD ++ possibleMovesLU ++ possibleMovesRD ++ possibleMovesRU).map( x => makeMove(position, x))
+
+  }
 
 }
