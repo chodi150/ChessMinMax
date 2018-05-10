@@ -20,8 +20,15 @@ class ChessBoardState(val playerOnePositions : Set[Position],
       }
   }
 
-    def display(): Unit = {
-      val chessBoard = availablePositions.map(p => Position(p.row,p.col,p.figure+99)) ++ playerTwoPositions.map(p => Position(p.row, p.col, -p.figure)) ++ playerOnePositions.map(p => Position(p.row,p.col,p.figure*10))
+    def display(playedComputer:Boolean): Unit = {
+      var chessBoard:Set[Position] = Set()
+      if(playedComputer){
+         chessBoard = availablePositions.map(p => Position(p.row,p.col,p.figure+99)) ++ playerTwoPositions.map(p => Position(p.row, p.col, -p.figure)) ++ playerOnePositions.map(p => Position(p.row,p.col,p.figure*10))
+      }
+      else{
+         chessBoard = availablePositions.map(p => Position(p.row,p.col,p.figure+99)) ++ playerTwoPositions.map(p => Position(p.row, p.col, 10*p.figure)) ++ playerOnePositions.map(p => Position(p.row,p.col,-p.figure))
+      }
+     // val chessBoard = availablePositions.map(p => Position(p.row,p.col,p.figure+99)) ++ playerTwoPositions.map(p => Position(p.row, p.col, -p.figure)) ++ playerOnePositions.map(p => Position(p.row,p.col,p.figure*10))
       val chessBoardSort = collection.immutable.SortedSet[Position]() ++ chessBoard
       chessBoardSort.grouped(8).foreach(x => {x.foreach(y=>print(y.figure+" ")); println("")})
     }
@@ -82,7 +89,7 @@ class ChessBoardState(val playerOnePositions : Set[Position],
     }
 
     def reverseChessBoard(positions: Set[Position]) : Set[Position] = {
-      positions.map(p => Position(7-p.col, 7-p.row, p.figure))
+      positions.map(p => Position(7-p.row, 7-p.col, p.figure))
     }
 
     def generateStatesForHorse(position: Position) : Set[ChessBoardState] = {
@@ -131,27 +138,120 @@ class ChessBoardState(val playerOnePositions : Set[Position],
     }
   }
 
-  def minimax(isMaximizingPlayer : Boolean, depth:Int) : ChessBoardState = {
+ // def nextState(isMaximizingPlayer : Boolean, depth:Int):ChessBoardState = minimax(isMaximizingPlayer, depth)._1
+
+//  def minimax(isMaximizingPlayer : Boolean, depth:Int) : (ChessBoardState, ChessBoardState)  = {
+//    if (depth==0 || isGameOver) {
+//      if (isMaximizingPlayer) {
+//        val bestChild = playerOnePositions.flatMap(p => generateStatesForPosition(p)).reduceLeft((x, y) => if (x.countScoreForChessState(true) > y.countScoreForChessState(true)) x else y)
+//        (this, bestChild)
+//      }
+//      else {
+//        val bestChild = playerOnePositions.flatMap(p => generateStatesForPosition(p)).reduceLeft((x, y) => if (x.countScoreForChessState(false) < y.countScoreForChessState(false)) x else y)
+//        (this,bestChild)
+//      }
+//    }
+//    else{
+//      if (isMaximizingPlayer) {
+//       playerOnePositions.flatMap(p => generateStatesForPosition(p)).map(x => x.minimax(false,depth-1)).
+//          reduceLeft((x,y)=> if(x._2.countScoreForChessState(true) > y._2.countScoreForChessState(true)) x else y)
+//
+//      }
+//      else {
+//        val possibleStates = playerOnePositions.flatMap(p => generateStatesForPosition(p)).map(x => x.minimax(true,depth-1))
+//        possibleStates.reduceLeft((x, y) => if (x._2.countScoreForChessState(false) < y._2.countScoreForChessState(false)) x else y)
+//
+//      }
+//    }
+//  }
+
+  def nextState(isMaximizingPlayer : Boolean, depth:Int):ChessBoardState = {
+    val allChildren = playerOnePositions.flatMap(p => generateStatesForPosition(p))
+    val allChildrenScores = allChildren.map(x => x.minimax(!isMaximizingPlayer, depth -1))
+    if (isMaximizingPlayer) {
+      val bestStateTuple = allChildrenScores.reduceLeft((x, y) => if (x._2 > y._2) x else y)
+      bestStateTuple._1
+    }else{
+      val bestStateTuple = allChildrenScores.reduceLeft((x, y) => if (x._2 < y._2) x else y)
+      bestStateTuple._1
+    }
+  }
+
+
+  def minimax(isMaximizingPlayer : Boolean, depth:Int) : (ChessBoardState, Int)  = {
     if (depth==0 || isGameOver) {
-      if (isMaximizingPlayer) {
-        playerOnePositions.flatMap(p => generateStatesForPosition(p)).reduceLeft((x, y) => if (x.countScoreForChessState(true) > y.countScoreForChessState(true)) x else y)
-      }
-      else {
-        playerOnePositions.flatMap(p => generateStatesForPosition(p)).reduceLeft((x, y) => if (x.countScoreForChessState(false) < y.countScoreForChessState(false)) x else y)
-      }
+        (this, countScoreForChessState(isMaximizingPlayer))
     }
     else{
       if (isMaximizingPlayer) {
-        val possibleStates = playerOnePositions.flatMap(p => generateStatesForPosition(p)).map(x => x.minimax(false,depth-1))
-        possibleStates.reduceLeft((x, y) => if (x.countScoreForChessState(true) > y.countScoreForChessState(true)) x else y)
+        val allChildren = playerOnePositions.flatMap(p => generateStatesForPosition(p))
+        val allChildrenScores = allChildren.map(x => x.minimax(false, depth -1))
+        allChildrenScores.reduceLeft((x,y) => if(x._2 > y._2) (this, x._2) else (this, y._2))
       }
       else {
-        val possibleStates = playerOnePositions.flatMap(p => generateStatesForPosition(p)).map(x => x.minimax(true,depth-1))
-        possibleStates.reduceLeft((x, y) => if (x.countScoreForChessState(false) < y.countScoreForChessState(false)) x else y)
-
+        val allChildren = playerOnePositions.flatMap(p => generateStatesForPosition(p))
+        val allChildrenScores = allChildren.map(x => x.minimax(true, depth -1))
+        allChildrenScores.reduceLeft((x,y) => if(x._2 < y._2) (this, x._2) else (this, y._2))
+      }
+    }
+  }
+  def nextStateAB(isMaximizingPlayer : Boolean, depth:Int):ChessBoardState = {
+    val allChildren = playerOnePositions.flatMap(p => generateStatesForPosition(p))
+    val allChildrenScores = allChildren.map(x => x.alphabeta(!isMaximizingPlayer, depth -1, -2000,2000))
+    if (isMaximizingPlayer) {
+      val bestStateTuple = allChildrenScores.reduceLeft((x, y) => if (x._2 > y._2) x else y)
+      bestStateTuple._1
+    }else{
+      val bestStateTuple = allChildrenScores.reduceLeft((x, y) => if (x._2 < y._2) x else y)
+      bestStateTuple._1
+    }
+  }
+  def alphabeta(isMaximizingPlayer : Boolean, depth:Int, a:Int, b:Int) : (ChessBoardState, Int) = {
+    if (depth<=0 || isGameOver) {
+      (this, countScoreForChessState(isMaximizingPlayer))
+    }
+    else {
+      if (isMaximizingPlayer) {
+        take_max(playerOnePositions.flatMap(p => generateStatesForPosition(p)), depth, a, b)
+      }
+      else {
+        take_min(playerOnePositions.flatMap(p => generateStatesForPosition(p)), depth, a, b)
       }
     }
   }
 
+  def take_max(children:Set[ChessBoardState], depth:Int, a:Int, b:Int): (ChessBoardState, Int) ={
+    var v:(ChessBoardState, Int) = (this,-2000)
+    val ab = children.head.alphabeta(false, depth-1, a,b)
+    v = if(v._2 > ab._2) v else ab
+    val new_a = if(v._2 > a) v._2 else a
+    if(b <= new_a || children.tail.isEmpty)
+      (this,v._2)
+    else
+      take_max(children.tail, depth, a, b)
+  }
+
+  def take_min(children:Set[ChessBoardState], depth:Int, a:Int, b:Int): (ChessBoardState, Int) = {
+    var v:(ChessBoardState, Int) = (this,2000)
+    val ab = children.head.alphabeta(true, depth-1, a,b)
+    v = if(v._2 < ab._2) v else ab
+    val new_b = if(v._2 < b) v._2 else b
+    if(new_b <= a || children.tail.isEmpty)
+      (this,v._2)
+    else
+      take_min(children.tail, depth, a, b)
+
+  }
+
+
+//  def alphaBeta(isMaximizingPlayer:Boolean, depth:Int, alpha:Int, beta:Int) : (ChessBoardState, Int) = {
+//    if(depth ==0 || isGameOver){
+//      (this,countScoreForChessState(isMaximizingPlayer))
+//    }
+//    if(isMaximizingPlayer){
+//
+//    }
+//
+//  }
 }
 

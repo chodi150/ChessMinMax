@@ -37,10 +37,15 @@ object Main extends App{
 //  chessBoardState3.display()
 //  print(chessBoardState3.isGameOver)
 
-  val p = Position(0,1,6)
+  val state1 = chessBoardState1.nextStateAB(true,2)
 
-  print(chessBoardState1.minimax(true,5).display())
-
+  val state2 = state1.makeMove(Position(1,5,1), Position(5,5,1))
+  val state3 = state2.nextStateAB(true,2)
+  state1.display(true)
+  println("")
+  state2.display(false)
+  println("")
+  state3.display(true)
 }
 
 
