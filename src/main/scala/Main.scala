@@ -30,22 +30,27 @@ object Main extends App{
     val king = Position(7,4,6)
     pawns + rook1 + rook2 + horse1 + horse2 + bishop1 + bishop2 + queen + king
   }
-  val chessBoardState1 = new ChessBoardState(initPlayerOnePositions(),initPlayerTwoPositions(),initAvailablePositions())
+
+
+  var state = new ChessBoardState(initPlayerOnePositions(),initPlayerTwoPositions(),initAvailablePositions())
+
+  while(!state.isGameOver){
+    state.display(true)
+    println("Enter your which figure to move")
+    val (row1, col1, figure1) = readf3("{0, number} {1,number} {2,number}")
+    println("Enter where to move your figure")
+    val (row2, col2, figure2) = readf3("{0, number} {1,number} {2,number}")
+    state = state.makeMove(Position(row1.asInstanceOf[Long].toInt,col1.asInstanceOf[Long].toInt,figure1.asInstanceOf[Long].toInt),Position(row2.asInstanceOf[Long].toInt,col2.asInstanceOf[Long].toInt,figure2.asInstanceOf[Long].toInt))
+    state = state.nextStateAB(true, 5)
+  }
+
 //  val chessBoardState = chessBoardState1.makeMove(Position(1,1,1), Position(5,1,1))
 //  val chessBoardState2 = chessBoardState.makeMove(Position(1,4,1), Position(2,4,1))
 //  val chessBoardState3 = chessBoardState2.makeMove(Position(0,4,6), Position(7,4,6))
 //  chessBoardState3.display()
 //  print(chessBoardState3.isGameOver)
 
-  val state1 = chessBoardState1.nextStateAB(true,2)
 
-  val state2 = state1.makeMove(Position(1,5,1), Position(5,5,1))
-  val state3 = state2.nextStateAB(true,2)
-  state1.display(true)
-  println("")
-  state2.display(false)
-  println("")
-  state3.display(true)
 }
 
 
