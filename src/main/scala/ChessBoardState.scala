@@ -52,24 +52,60 @@ class ChessBoardState(val playerOnePositions : Set[Position],
     }
   }
 
-  def generateStatesForBishop(position:Position) : Set[ChessBoardState] = {
-    val pseudoPossibleMovesRD = Range(1,8).map(x => Position(position.row + x, position.col+x, 3)).takeWhile(x => !playerOnePositions(x)).filter(x => x.positionOnBoard()).toSet
-    val movesBehindFirstEnemyRD = Range(1,8).map(x => Position(position.row + x, position.col+x, 3)).dropWhile(x => !playerTwoPositions(x)).drop(1).filter(x => x.positionOnBoard()).toSet
-    val possibleMovesRD = pseudoPossibleMovesRD -- movesBehindFirstEnemyRD
+//  def generateStatesForBishop(position:Position) : Set[ChessBoardState] = {
+//    val pseudoPossibleMovesRD = Range(1,8).map(x => Position(position.row + x, position.col+x, 3)).takeWhile(x => !playerOnePositions(x)).filter(x => x.positionOnBoard()).toSet
+//    val movesBehindFirstEnemyRD = Range(1,8).map(x => Position(position.row + x, position.col+x, 3)).dropWhile(x => !playerTwoPositions(x)).drop(1).filter(x => x.positionOnBoard()).toSet
+//    val possibleMovesRD = pseudoPossibleMovesRD -- movesBehindFirstEnemyRD
+//
+//    val pseudoPossibleMovesRU = Range(1,8).map(x => Position(position.row - x, position.col+x, 3)).takeWhile(x => !playerOnePositions(x)).filter(x => x.positionOnBoard()).toSet
+//    val movesBehindFirstEnemyRU = Range(1,8).map(x => Position(position.row - x, position.col+x, 3)).dropWhile(x => !playerTwoPositions(x)).drop(1).filter(x => x.positionOnBoard()).toSet
+//    val possibleMovesRU = pseudoPossibleMovesRU -- movesBehindFirstEnemyRU
+//
+//    val pseudoPossibleMovesLD = Range(1,8).map(x => Position(position.row + x, position.col-x, 3)).takeWhile(x => !playerOnePositions(x)).filter(x => x.positionOnBoard()).toSet
+//    val movesBehindFirstEnemyLD = Range(1,8).map(x => Position(position.row + x, position.col-x, 3)).dropWhile(x => !playerTwoPositions(x)).drop(1).filter(x => x.positionOnBoard()).toSet
+//    val possibleMovesLD = pseudoPossibleMovesRU -- movesBehindFirstEnemyRU
+//
+//    val pseudoPossibleMovesLU = Range(1,8).map(x => Position(position.row - x, position.col-x, 3)).takeWhile(x => !playerOnePositions(x)).filter(x => x.positionOnBoard()).toSet
+//    val movesBehindFirstEnemyLU = Range(1,8).map(x => Position(position.row - x, position.col-x, 3)).dropWhile(x => !playerTwoPositions(x)).drop(1).filter(x => x.positionOnBoard()).toSet
+//    val possibleMovesLU = pseudoPossibleMovesRU -- movesBehindFirstEnemyRU
+//
+//    (possibleMovesLD ++ possibleMovesLU ++ possibleMovesRD ++ possibleMovesRU).map( x => makeMove(position, x))
+//
+//  }
 
-    val pseudoPossibleMovesRU = Range(1,8).map(x => Position(position.row - x, position.col+x, 3)).takeWhile(x => !playerOnePositions(x)).filter(x => x.positionOnBoard()).toSet
-    val movesBehindFirstEnemyRU = Range(1,8).map(x => Position(position.row - x, position.col+x, 3)).dropWhile(x => !playerTwoPositions(x)).drop(1).filter(x => x.positionOnBoard()).toSet
-    val possibleMovesRU = pseudoPossibleMovesRU -- movesBehindFirstEnemyRU
-
-    val pseudoPossibleMovesLD = Range(1,8).map(x => Position(position.row + x, position.col-x, 3)).takeWhile(x => !playerOnePositions(x)).filter(x => x.positionOnBoard()).toSet
-    val movesBehindFirstEnemyLD = Range(1,8).map(x => Position(position.row + x, position.col-x, 3)).dropWhile(x => !playerTwoPositions(x)).drop(1).filter(x => x.positionOnBoard()).toSet
-    val possibleMovesLD = pseudoPossibleMovesRU -- movesBehindFirstEnemyRU
-
-    val pseudoPossibleMovesLU = Range(1,8).map(x => Position(position.row - x, position.col-x, 3)).takeWhile(x => !playerOnePositions(x)).filter(x => x.positionOnBoard()).toSet
-    val movesBehindFirstEnemyLU = Range(1,8).map(x => Position(position.row - x, position.col-x, 3)).dropWhile(x => !playerTwoPositions(x)).drop(1).filter(x => x.positionOnBoard()).toSet
-    val possibleMovesLU = pseudoPossibleMovesRU -- movesBehindFirstEnemyRU
-
-    (possibleMovesLD ++ possibleMovesLU ++ possibleMovesRD ++ possibleMovesRU).map( x => makeMove(position, x))
+  def generateStatesForBishop(position: Position) : Set[ChessBoardState] = {
+    val bishopMoves = tryToMoveInDirection(position,1,1) ++ tryToMoveInDirection(position,1,-1) ++ tryToMoveInDirection(position,-1,1) ++ tryToMoveInDirection(position,-1,-1)
+    bishopMoves.map(x=>makeMove(position,x))
+  }
+  def generateStatesForRook(position: Position) : Set[ChessBoardState] = {
+    val rookMoves = tryToMoveInDirection(position,0,1) ++ tryToMoveInDirection(position,1,0) ++ tryToMoveInDirection(position,0,-1) ++ tryToMoveInDirection(position,-1,0)
+    rookMoves.map(x=>makeMove(position,x))
+  }
+  def generateStatesForQueen(position: Position) : Set[ChessBoardState] = {
+    generateStatesForBishop(position) ++ generateStatesForRook(position)
+  }
+  def tryToMoveInDirection(position: Position, colMove : Int, rowMove : Int) : Set[Position] = {
+    val newPosition=Position(position.row+1, position.col+1, position.figure)
+    if(!newPosition.positionOnBoard())
+      return Set()
+    val playerTwoExists = playerTwoPositions.toStream.exists(p => p.equalCoords(newPosition))
+    val playerOneExists = playerOnePositions.toStream.exists(p => p.equalCoords(newPosition))
+    if(isPlayerOneMove){
+      if(playerOneExists)
+        Set()
+      else if(playerTwoExists)
+        Set(newPosition)
+      else
+        Set(newPosition)++tryToMoveInDirection(newPosition, colMove, rowMove)
+    }
+    else{
+      if(playerTwoExists)
+        Set()
+      else if(playerOneExists)
+        Set(newPosition)
+      else
+        Set(newPosition)++tryToMoveInDirection(newPosition, colMove, rowMove)
+    }
 
   }
 
