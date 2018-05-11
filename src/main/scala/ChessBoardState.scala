@@ -126,7 +126,7 @@ class ChessBoardState(val playerOnePositions : Set[Position],
     case 3 => 3
     case 4 => 5
     case 5 => 9
-    case 6 => 100
+    case 6 => 1000
   }
 
   def countScoreForChessState(isMaximizingPlayer: Boolean) : Int = {
@@ -185,12 +185,12 @@ class ChessBoardState(val playerOnePositions : Set[Position],
     else{
       if (isMaximizingPlayer) {
         val allChildren = playerOnePositions.flatMap(p => generateStatesForPosition(p))
-        val allChildrenScores = allChildren.map(x => x.minimax(false, depth -1))
+        val allChildrenScores = allChildren.map(x => x.minimax(!isMaximizingPlayer, depth -1))
         allChildrenScores.reduceLeft((x,y) => if(x._2 > y._2) (this, x._2) else (this, y._2))
       }
       else {
         val allChildren = playerOnePositions.flatMap(p => generateStatesForPosition(p))
-        val allChildrenScores = allChildren.map(x => x.minimax(true, depth -1))
+        val allChildrenScores = allChildren.map(x => x.minimax(isMaximizingPlayer, depth -1))
         allChildrenScores.reduceLeft((x,y) => if(x._2 < y._2) (this, x._2) else (this, y._2))
       }
     }
