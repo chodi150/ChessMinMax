@@ -201,7 +201,7 @@ class ChessBoardState(val playerOnePositions : Set[Position],
   }
   def nextStateAB(isMaximizingPlayer : Boolean, depth:Int):ChessBoardState = {
     val allChildren = playerOnePositions.flatMap(p => generateStatesForPosition(p))
-    val allChildrenScores = allChildren.map(x => x.alphabeta(!isMaximizingPlayer, depth -1, -2000,2000))
+    val allChildrenScores = allChildren.map(x => x.alphabeta(isMaximizingPlayer, depth -1, -2000,2000))
     if (isMaximizingPlayer) {
       val bestStateTuple = allChildrenScores.reduceLeft((x, y) => if (x._2 > y._2) x else y)
       bestStateTuple._1
@@ -216,34 +216,34 @@ class ChessBoardState(val playerOnePositions : Set[Position],
     }
     else {
       if (isMaximizingPlayer) {
-        take_max(playerOnePositions.flatMap(p => generateStatesForPosition(p)), depth, a, b)
+        take_min(playerOnePositions.flatMap(p => generateStatesForPosition(p)), depth, a, b, -2000)
       }
       else {
-        take_min(playerOnePositions.flatMap(p => generateStatesForPosition(p)), depth, a, b)
+        take_max(playerOnePositions.flatMap(p => generateStatesForPosition(p)), depth, a, b, 2000)
       }
     }
   }
 
-  def take_max(children:Set[ChessBoardState], depth:Int, a:Int, b:Int): (ChessBoardState, Int) ={
-    var v:(ChessBoardState, Int) = (this,-2000)
-    val ab = children.head.alphabeta(false, depth-1, a,b)
-    v = if(v._2 > ab._2) v else ab
-    val new_a = if(v._2 > a) v._2 else a
+  def take_max(children:Set[ChessBoardState], depth:Int, a:Int, b:Int, v_val:Int): (ChessBoardState, Int) ={
+    val v:(ChessBoardState, Int) = (this,v_val)
+    val ab = children.head.alphabeta(true, depth-1, a,b)
+    val new_v = if(v._2 > ab._2) v else ab
+    val new_a = if(new_v._2 > a) new_v._2 else a
     if(b <= new_a || children.tail.isEmpty)
-      (this,v._2)
+      (this,new_v._2)
     else
-      take_max(children.tail, depth, a, b)
+      take_max(children.tail, depth, a, b, new_v._2)
   }
 
-  def take_min(children:Set[ChessBoardState], depth:Int, a:Int, b:Int): (ChessBoardState, Int) = {
-    var v:(ChessBoardState, Int) = (this,2000)
-    val ab = children.head.alphabeta(true, depth-1, a,b)
-    v = if(v._2 < ab._2) v else ab
-    val new_b = if(v._2 < b) v._2 else b
+  def take_min(children:Set[ChessBoardState], depth:Int, a:Int, b:Int, v_val:Int): (ChessBoardState, Int) = {
+    val v:(ChessBoardState, Int) = (this,v_val)
+    val ab = children.head.alphabeta(false, depth-1, a,b)
+    val new_v = if(v._2 < ab._2) v else ab
+    val new_b = if(new_v._2 < b) new_v._2 else b
     if(new_b <= a || children.tail.isEmpty)
-      (this,v._2)
+      (this,new_v._2)
     else
-      take_min(children.tail, depth, a, b)
+      take_min(children.tail, depth, a, b, new_v._2)
 
   }
 
