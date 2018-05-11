@@ -131,10 +131,10 @@ class ChessBoardState(val playerOnePositions : Set[Position],
 
   def countScoreForChessState(isMaximizingPlayer: Boolean) : Int = {
     if(isMaximizingPlayer){
-      playerTwoPositions.map(p=>countScoreForFigure(p.figure)).sum - playerOnePositions.map(p=>countScoreForFigure(p.figure)).sum
+      playerTwoPositions.toStream.map(p=>countScoreForFigure(p.figure)).sum - playerOnePositions.toStream.map(p=>countScoreForFigure(p.figure)).sum
     }
     else{
-      playerOnePositions.map(p=>countScoreForFigure(p.figure)).sum - playerTwoPositions.map(p=>countScoreForFigure(p.figure)).sum
+      playerOnePositions.toStream.map(p=>countScoreForFigure(p.figure)).sum - playerTwoPositions.toStream.map(p=>countScoreForFigure(p.figure)).sum
     }
   }
 
@@ -166,8 +166,8 @@ class ChessBoardState(val playerOnePositions : Set[Position],
 //  }
 
   def nextState(isMaximizingPlayer : Boolean, depth:Int):ChessBoardState = {
-    val allChildren = playerOnePositions.flatMap(p => generateStatesForPosition(p))
-    val allChildrenScores = allChildren.map(x => x.minimax(!isMaximizingPlayer, depth -1))
+    val allChildren = allPossibleUpcomingStates
+    val allChildrenScores = allChildren.map(x => x.minimax(isMaximizingPlayer, depth -1))
     if (isMaximizingPlayer) {
       val bestStateTuple = allChildrenScores.reduceLeft((x, y) => if (x._2 > y._2) x else y)
       bestStateTuple._1
@@ -178,6 +178,10 @@ class ChessBoardState(val playerOnePositions : Set[Position],
   }
 
 
+  def allPossibleUpcomingStates: Set[ChessBoardState] = {
+    playerOnePositions.flatMap(p => generateStatesForPosition(p))
+  }
+
   def minimax(isMaximizingPlayer : Boolean, depth:Int) : (ChessBoardState, Int)  = {
     if (depth==0 || isGameOver) {
         (this, countScoreForChessState(isMaximizingPlayer))
@@ -186,12 +190,12 @@ class ChessBoardState(val playerOnePositions : Set[Position],
       if (isMaximizingPlayer) {
         val allChildren = playerOnePositions.flatMap(p => generateStatesForPosition(p))
         val allChildrenScores = allChildren.map(x => x.minimax(!isMaximizingPlayer, depth -1))
-        allChildrenScores.reduceLeft((x,y) => if(x._2 > y._2) (this, x._2) else (this, y._2))
+        allChildrenScores.reduceLeft((x,y) => if(x._2 < y._2) (this, x._2) else (this, y._2))
       }
       else {
         val allChildren = playerOnePositions.flatMap(p => generateStatesForPosition(p))
         val allChildrenScores = allChildren.map(x => x.minimax(isMaximizingPlayer, depth -1))
-        allChildrenScores.reduceLeft((x,y) => if(x._2 < y._2) (this, x._2) else (this, y._2))
+        allChildrenScores.reduceLeft((x,y) => if(x._2 > y._2) (this, x._2) else (this, y._2))
       }
     }
   }

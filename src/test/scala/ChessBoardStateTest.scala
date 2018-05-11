@@ -1,5 +1,4 @@
 import Main.{initAvailablePositions, initPlayerOnePositions, initPlayerTwoPositions}
-import Main.{chessBoardState1, initAvailablePositions, initPlayerOnePositions, initPlayerTwoPositions}
 import org.scalatest.FunSuite
 
 class ChessBoardStateTest extends FunSuite {
@@ -168,4 +167,11 @@ class ChessBoardStateTest extends FunSuite {
     val p = Position(0,3,5)
   }
 
+  test("Queen and king in danger, CPU saves king"){
+    val state1 = initialStateOfGame.makeMove(Position(0,1,2), Position(5,2,2))
+    val state2 = state1.makeMove(Position(1,1,1), Position(1,1,1))
+    val state3 = state2.makeMove(Position(0,6,2), Position(5,5,2))
+    val state4 = state3.nextState(true, 4)
+    assert(state4.playerTwoPositions(Position(5,5,1)))
+  }
 }
