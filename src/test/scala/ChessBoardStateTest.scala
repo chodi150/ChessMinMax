@@ -174,4 +174,17 @@ class ChessBoardStateTest extends FunSuite {
     val state4 = state3.nextState(true, 4)
     assert(state4.playerTwoPositions(Position(5,5,1)))
   }
+  test("depth 1 - if is able to smash then does it 0") {
+    val chessBoardState = new ChessBoardState(initPlayerOnePositions(),initPlayerTwoPositions(),initAvailablePositions())
+    val chessBoardState2 = chessBoardState.makeMove(Position(1,0,1), Position(5,0,1))
+    val chessBoardState3 = chessBoardState2.nextState(true, 1)
+    assert(!chessBoardState3.playerOnePositions.contains(Position(5,0,1)))
+  }
+  test("depth 1 - if is able to smash then does it 1") {
+    val chessBoardState = new ChessBoardState(initPlayerOnePositions(),initPlayerTwoPositions(),initAvailablePositions())
+    val chessBoardState2 = chessBoardState.makeMove(Position(1,1,1), Position(5,1,1))
+    val chessBoardState3 = chessBoardState2.nextState(true, 1)
+    assert(!chessBoardState3.playerOnePositions.contains(Position(5,1,1)))
+  }
+
 }
