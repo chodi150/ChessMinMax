@@ -41,7 +41,7 @@ object Main extends App{
     println("Enter where to move your figure")
     val (row2, col2, figure2) = readf3("{0, number} {1,number} {2,number}")
     state = state.makeMove(Position(row1.asInstanceOf[Long].toInt,col1.asInstanceOf[Long].toInt,figure1.asInstanceOf[Long].toInt),Position(row2.asInstanceOf[Long].toInt,col2.asInstanceOf[Long].toInt,figure2.asInstanceOf[Long].toInt))
-    state = state.nextState(true, 4)
+    state = state.nextStateAB(true, 4)
   }
 
 //  val chessBoardState = chessBoardState1.makeMove(Position(1,1,1), Position(5,1,1))

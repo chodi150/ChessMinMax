@@ -189,9 +189,16 @@ class ChessBoardStateTest extends FunSuite {
 
   test("Queen and king in danger, CPU saves king ALPHA BETTTTA"){
     val state1 = initialStateOfGame.makeMove(Position(0,1,2), Position(5,2,2))
+    state1.display(false)
+    println("********")
     val state2 = state1.makeMove(Position(1,1,1), Position(1,1,1))
+    state2.display(true)
+    println("********")
     val state3 = state2.makeMove(Position(0,6,2), Position(5,5,2))
+    state3.display(false)
+    println("********")
     val state4 = state3.nextStateAB(true, 4)
+    state4.display(true)
     assert(state4.playerTwoPositions(Position(5,5,1)))
   }
   test("depth 1 - if is able to smash then does it 0 ALPHA BETTTTA") {

@@ -216,10 +216,10 @@ class ChessBoardState(val playerOnePositions : Set[Position],
     }
     else {
       if (isMaximizingPlayer) {
-        take_min(playerOnePositions.flatMap(p => generateStatesForPosition(p)), depth, a, b, -2000)
+        take_min(playerOnePositions.flatMap(p => generateStatesForPosition(p)), depth, a, b, 2000)
       }
       else {
-        take_max(playerOnePositions.flatMap(p => generateStatesForPosition(p)), depth, a, b, 2000)
+        take_max(playerOnePositions.flatMap(p => generateStatesForPosition(p)), depth, a, b, -2000)
       }
     }
   }
@@ -232,7 +232,7 @@ class ChessBoardState(val playerOnePositions : Set[Position],
     if(b <= new_a || children.tail.isEmpty)
       (this,new_v._2)
     else
-      take_max(children.tail, depth, a, b, new_v._2)
+      take_max(children.tail, depth, new_a, b, new_v._2)
   }
 
   def take_min(children:Set[ChessBoardState], depth:Int, a:Int, b:Int, v_val:Int): (ChessBoardState, Int) = {
@@ -243,7 +243,7 @@ class ChessBoardState(val playerOnePositions : Set[Position],
     if(new_b <= a || children.tail.isEmpty)
       (this,new_v._2)
     else
-      take_min(children.tail, depth, a, b, new_v._2)
+      take_min(children.tail, depth, a, new_b, new_v._2)
 
   }
 
