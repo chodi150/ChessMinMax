@@ -214,4 +214,27 @@ class ChessBoardStateTest extends FunSuite {
     assert(!chessBoardState3.playerOnePositions.contains(Position(5,1,1)))
   }
 
+
+  test("CPU has king in danger, but can beat opponents KING, he decides to attack ! ALFA BETA"){
+    val state0 = initialStateOfGame.makeMove(Position(1,1,1), Position(1,1,1))
+    val state1 = state0.makeMove(Position(0,4,5), Position(6,3,5))
+    val state2 = state1.makeMove(Position(0,3,5), Position(6,4,5))
+    state2.display(false)
+    println("")
+    val state3 = state2.nextStateAB(true, 1)
+    state3.display(true)
+    assert(state3.playerTwoPositions.contains(Position(0,4,5)))
+  }
+
+  test("CPU has king in danger, but can beat opponents KING, he decides to attack ! minmax"){
+    val state0 = initialStateOfGame.makeMove(Position(1,1,1), Position(1,1,1))
+    val state1 = state0.makeMove(Position(0,4,5), Position(6,3,5))
+    val state2 = state1.makeMove(Position(0,3,5), Position(6,4,5))
+    state2.display(false)
+    println("")
+    val state3 = state2.nextState(true, 1)
+    state3.display(true)
+    assert(state3.playerTwoPositions.contains(Position(0,4,5)))
+  }
+
 }
