@@ -12,15 +12,15 @@ class ChessBoardState(val playerOnePositions : Set[Position],
     this.playerOnePositions==obj.playerOnePositions && this.playerTwoPositions==obj.playerTwoPositions && this.availablePositions==obj.availablePositions
   }
 
-  def checkLose(positions: Set[Position]): Boolean = !positions.toStream.exists(p => p.figure == 6)
+  def checkLose(positions: Set[Position]): Boolean = !positions.toStream.exists(p => p.field.getClass==classOf[King]) //TODO nieladne
 
   def makeMove(p1: Position, p2: Position): ChessBoardState = {
       val p = playerTwoPositions.toStream.find(p => p.equalCoords(p2)).orNull
       if (p != null) {
-        new ChessBoardState(reversePositions(playerTwoPositions - p),reversePositions(playerOnePositions - p1 + p2), reversePositions(availablePositions + Position(p1.row, p1.col, 0)))
+        new ChessBoardState(reversePositions(playerTwoPositions - p),reversePositions(playerOnePositions - p1 + p2), reversePositions(availablePositions + Position(p1.row, p1.col, new EmptyField())))
       }
       else {
-        new ChessBoardState(reversePositions(playerTwoPositions),reversePositions(playerOnePositions - p1 + p2), reversePositions(availablePositions + Position(p1.row, p1.col, 0) - p2))
+        new ChessBoardState(reversePositions(playerTwoPositions),reversePositions(playerOnePositions - p1 + p2), reversePositions(availablePositions + Position(p1.row, p1.col, new EmptyField()) - p2))
       }
   }
 
@@ -38,19 +38,19 @@ class ChessBoardState(val playerOnePositions : Set[Position],
       println("*****************************")
       var chessBoard:Set[Position] = Set()
       if(playedComputer){
-         chessBoard = availablePositions.map(p => Position(p.row,p.col,p.figure+99)) ++ playerTwoPositions.map(p => Position(p.row, p.col, -p.figure)) ++ playerOnePositions.map(p => Position(p.row,p.col,p.figure*10))
+         chessBoard = availablePositions.map(p => Position(p.row,p.col,p.field)) ++ playerTwoPositions.map(p => Position(p.row, p.col, p.field)) ++ playerOnePositions.map(p => Position(p.row,p.col,p.field))
       }
       else{
-         chessBoard = availablePositions.map(p => Position(p.row,p.col,p.figure+99)) ++ playerTwoPositions.map(p => Position(p.row, p.col, 10*p.figure)) ++ playerOnePositions.map(p => Position(p.row,p.col,-p.figure))
+         chessBoard = availablePositions.map(p => Position(p.row,p.col,p.field)) ++ playerTwoPositions.map(p => Position(p.row, p.col, p.field)) ++ playerOnePositions.map(p => Position(p.row,p.col,p.field))
       }
       val chessBoardSort = collection.immutable.SortedSet[Position]() ++ chessBoard
-      chessBoardSort.grouped(8).foreach(x => {x.foreach(y=>print(y.figure+" ")); println("")})
+      //chessBoardSort.grouped(8).foreach(x => {x.foreach(y=>print(y.field" ")); println("")}) TODO
     }
 
 
 
     def reversePositions(positions: Set[Position]) : Set[Position] = {
-      positions.map(p => Position(7-p.row, 7-p.col, p.figure))
+      positions.map(p => Position(7-p.row, 7-p.col, p.field))
     }
 
     def reverseChessBoardState() : ChessBoardState = {
@@ -61,9 +61,10 @@ class ChessBoardState(val playerOnePositions : Set[Position],
     }
 
   def generateStatesForPosition(position: Position) : Set[ChessBoardState] =  {
-    val figure:Figure = mapFigure(position.figure)
+    val figure:Figure = position.field.asInstanceOf[Figure] //TODO poprawic bo gowno
     val possiblePositions = figure.generatePositions(position,this)
     possiblePositions.map(p => makeMove(position,p))
+
   }
 
   def mapFigure(num:Int):Figure = num match {
@@ -77,21 +78,16 @@ class ChessBoardState(val playerOnePositions : Set[Position],
 
 
 
-  def countScoreForFigure(figure : Int): Int = figure match {
-    case 1 => 1
-    case 2 => 3
-    case 3 => 3
-    case 4 => 5
-    case 5 => 9
-    case 6 => 1000
+  def countScoreForFigure(field : Field): Int =  {
+    field.asInstanceOf[Figure].value
   }
 
   def countScoreForChessState(isMaximizingPlayer: Boolean) : Int = {
     if(isMaximizingPlayer){
-      playerTwoPositions.toStream.map(p=>countScoreForFigure(p.figure)).sum - playerOnePositions.toStream.map(p=>countScoreForFigure(p.figure)).sum
+      playerTwoPositions.toStream.map(p=>countScoreForFigure(p.field)).sum - playerOnePositions.toStream.map(p=>countScoreForFigure(p.field)).sum
     }
     else{
-      playerOnePositions.toStream.map(p=>countScoreForFigure(p.figure)).sum - playerTwoPositions.toStream.map(p=>countScoreForFigure(p.figure)).sum
+      playerOnePositions.toStream.map(p=>countScoreForFigure(p.field)).sum - playerTwoPositions.toStream.map(p=>countScoreForFigure(p.field)).sum
     }
   }
 
