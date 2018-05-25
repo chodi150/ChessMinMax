@@ -35,10 +35,10 @@ class ChessBoardState(val playerOnePositions : Set[Position],
       println("*****************************")
       var chessBoard:Set[DisplayablePosition] = Set()
       if(playedComputer){
-         chessBoard = availablePositions.map(p => DisplayablePosition(p,true)) ++ playerTwoPositions.map(p => DisplayablePosition(p,false)) ++ playerOnePositions.map(p => DisplayablePosition(p,true))
+         chessBoard = availablePositions.map(p => DisplayablePosition(p,true)) ++ playerTwoPositions.map(p => DisplayablePosition(p,true)) ++ playerOnePositions.map(p => DisplayablePosition(p,false))
       }
       else{
-         chessBoard = availablePositions.map(p => DisplayablePosition(p,true)) ++ playerTwoPositions.map(p => DisplayablePosition(p,true)) ++ playerOnePositions.map(p => DisplayablePosition(p,false))
+         chessBoard = availablePositions.map(p => DisplayablePosition(p,true)) ++ playerTwoPositions.map(p => DisplayablePosition(p,false)) ++ playerOnePositions.map(p => DisplayablePosition(p,true))
       }
       val chessBoardSort = collection.immutable.SortedSet[DisplayablePosition]() ++ chessBoard
       chessBoardSort.grouped(8).foreach(x => {x.foreach(y=>print(y.getDisplayedValue +  " ")); println("")})
