@@ -46,11 +46,6 @@ class ChessBoardState(val playerOnePositions : Set[Position],
       new ChessBoardState(playerOneNewPositions, playerTwoNewPositions, newAvailablePositions)
     }
 
-    def generateStatesForHorse(position: Position) : Set[ChessBoardState] = {
-      val possibleMoves: Set[Position] = generatePositionsForHorse(position)
-      possibleMoves.map(p => makeMove(position,p))
-    }
-
   def generateStatesForPosition(position: Position) : Set[ChessBoardState] =  {
     val figure:Figure = mapFigure(position.figure)
     val possiblePositions = figure.generatePositions(position,this)
