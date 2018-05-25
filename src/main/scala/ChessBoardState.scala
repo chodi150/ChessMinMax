@@ -8,6 +8,10 @@ class ChessBoardState(val playerOnePositions : Set[Position],
   lazy val playerOneLose: Boolean = checkLose(playerOnePositions)
   lazy val playerTwoLose: Boolean = checkLose(playerTwoPositions)
 
+  def equals(obj: ChessBoardState): Boolean = {
+    this.playerOnePositions==obj.playerOnePositions && this.playerTwoPositions==obj.playerTwoPositions && this.availablePositions==obj.availablePositions
+  }
+
   def checkLose(positions: Set[Position]): Boolean = !positions.toStream.exists(p => p.figure == 6)
 
   def makeMove(p1: Position, p2: Position): ChessBoardState = {
@@ -18,6 +22,16 @@ class ChessBoardState(val playerOnePositions : Set[Position],
       else {
         new ChessBoardState(reversePositions(playerTwoPositions),reversePositions(playerOnePositions - p1 + p2), reversePositions(availablePositions + Position(p1.row, p1.col, 0) - p2))
       }
+  }
+
+  def isValidMove(p1: Position, p2: Position): Boolean = {
+      if(p1.figure != p2.figure || !playerOnePositions.contains(p1)){
+        return false
+      }
+      val possibleStates = generateStatesForPosition(p1)
+      val potentialNextState = makeMove(p1,p2)
+      val x = possibleStates.map(f => f.equals(potentialNextState))
+      x contains true
   }
 
     def display(playedComputer:Boolean): Unit = {

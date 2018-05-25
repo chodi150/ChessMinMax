@@ -42,17 +42,7 @@ object Main extends App{
     }
     if(playedComputer){
       chessBoardState.display(playedComputer)
-      println("Enter type of your figure to move")
-      val figure1 = readTypeOfFigure()
-      println("Enter row of your figure to move")
-      val row1 = readRow()
-      println("Enter column of your figure to move")
-      val col1 = readColumn()
-      println("Enter row where you want to move")
-      val row2 = readRow()
-      println("Enter column where you want to move")
-      val col2 = readColumn()
-      val nextState = chessBoardState.makeMove(Position(row1,col1,figure1),Position(row2,col2,figure1))
+      val nextState: ChessBoardState = userMakeMove(chessBoardState)
       play(nextState, false)
     }
     else{
@@ -60,6 +50,29 @@ object Main extends App{
       reversedChessBoardState.display(!playedComputer)
       play(chessBoardState.nextStateAlphaBeta(true, 4), true)
     }
+  }
+
+  private def userMakeMove(chessBoardState: ChessBoardState) : ChessBoardState = {
+    println("Enter type of your figure to move")
+    val figure1 = readTypeOfFigure()
+    println("Enter row of your figure to move")
+    val row1 = readRow()
+    println("Enter column of your figure to move")
+    val col1 = readColumn()
+    println("Enter row where you want to move")
+    val row2 = readRow()
+    println("Enter column where you want to move")
+    val col2 = readColumn()
+    val p1 = Position(row1, col1, figure1)
+    val p2 = Position(row2, col2, figure1)
+    if(chessBoardState.isValidMove(p1,p2))
+      chessBoardState.makeMove(p1,p2)
+    else{
+      println("INVALID MOVE!!!!!")
+      userMakeMove(chessBoardState)
+    }
+
+
   }
 
   def readRow() : Int = {
@@ -91,7 +104,7 @@ object Main extends App{
     }
     else {
       println("Incorrect type of figure")
-      readRow()
+      readTypeOfFigure()
     }
   }
 

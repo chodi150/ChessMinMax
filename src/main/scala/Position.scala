@@ -17,7 +17,6 @@ case class Position(row: Int, col: Int, figure: Int) extends Ordered[Position]{
 
   def equalCoords(position: Position): Boolean = this.compare(position)==0
 
-
   def positionOnBoard():Boolean = row<8 && row>=0 && col<8 && col>=0
 }
 
