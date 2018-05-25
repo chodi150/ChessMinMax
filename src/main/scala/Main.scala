@@ -1,3 +1,5 @@
+import scala.util.Try
+
 /**
   * Created by Piotr on 09.05.2018.
   */
@@ -17,7 +19,6 @@ object Main extends App{
     val king = Position(0,4,6)
     pawns + rook1 + rook2 + horse1 + horse2 + bishop1 + bishop2 + queen + king
   }
-
   def initPlayerTwoPositions() : Set[Position] = {
     val pawns = Range(6,7).flatMap(x=> Range(0,8).map(y => Position(x,y,1))).toSet
     val rook1 = Position(7,0,4)
@@ -32,17 +33,81 @@ object Main extends App{
   }
 
 
-  var state = new ChessBoardState(initPlayerOnePositions(),initPlayerTwoPositions(),initAvailablePositions())
 
-  while(!state.isGameOver){
-    state.display(true)
-    println("Enter your which figure to move")
-    val (row1, col1, figure1) = readf3("{0, number} {1,number} {2,number}")
-    println("Enter where to move your figure")
-    val (row2, col2, figure2) = readf3("{0, number} {1,number} {2,number}")
-    state = state.makeMove(Position(row1.asInstanceOf[Long].toInt,col1.asInstanceOf[Long].toInt,figure1.asInstanceOf[Long].toInt),Position(row2.asInstanceOf[Long].toInt,col2.asInstanceOf[Long].toInt,figure2.asInstanceOf[Long].toInt))
-    state = state.nextStateAB(true, 4)
+
+  def play(chessBoardState: ChessBoardState, playedComputer: Boolean) : Boolean = {
+    if(chessBoardState.isGameOver){
+      println("Player wins: " + !playedComputer)
+      return true
+    }
+    if(playedComputer){
+      chessBoardState.display(playedComputer)
+      println("Enter type of your figure to move")
+      val figure1 = readTypeOfFigure()
+      println("Enter row of your figure to move")
+      val row1 = readRow()
+      println("Enter column of your figure to move")
+      val col1 = readColumn()
+      println("Enter row where you want to move")
+      val row2 = readRow()
+      println("Enter column where you want to move")
+      val col2 = readColumn()
+      val nextState = chessBoardState.makeMove(Position(row1,col1,figure1),Position(row2,col2,figure1))
+      play(nextState, false)
+    }
+    else{
+      val reversedChessBoardState = chessBoardState.reverseChessBoardState()
+      reversedChessBoardState.display(!playedComputer)
+      play(chessBoardState.nextStateAlphaBeta(true, 4), true)
+    }
   }
+
+  def readRow() : Int = {
+    val input = scala.io.StdIn.readLine()
+    if(Try(input.toInt).isSuccess && input.toInt>=0 && input.toInt<=7){
+      input.toInt
+    }
+    else {
+      println("Incorrect row")
+      readRow()
+    }
+  }
+
+  def readColumn() : Int = {
+    val input = scala.io.StdIn.readLine()
+    if(Try(input.toInt).isSuccess && input.toInt>=0 && input.toInt<=7){
+      input.toInt
+    }
+    else {
+      println("Incorrect column")
+      readRow()
+    }
+  }
+
+  def readTypeOfFigure() : Int = {
+    val input = scala.io.StdIn.readLine()
+    if(Try(input.toInt).isSuccess && input.toInt>=1 && input.toInt<=6){
+      input.toInt
+    }
+    else {
+      println("Incorrect type of figure")
+      readRow()
+    }
+  }
+
+  val initialState = new ChessBoardState(initPlayerOnePositions(),initPlayerTwoPositions(),initAvailablePositions())
+  play(initialState, true)
+
+
+//  while(!state.isGameOver){
+//    state.display(true)
+//    println("Enter your which figure to move")
+//    val (row1, col1, figure1: Any) = readf3("{0, number} {1,number} {2,number}")
+//    println("Enter where to move your figure")
+//    val (row2, col2, figure2) = readf3("{0, number} {1,number} {2,number}")
+//    state = state.makeMove(Position(row1.asInstanceOf[Long].toInt,col1.asInstanceOf[Long].toInt,figure1.asInstanceOf[Long].toInt),Position(row2.asInstanceOf[Long].toInt,col2.asInstanceOf[Long].toInt,figure2.asInstanceOf[Long].toInt))
+//    state = state.nextStateAlphaBeta(true, 4)
+//  }
 
 //  val chessBoardState = chessBoardState1.makeMove(Position(1,1,1), Position(5,1,1))
 //  val chessBoardState2 = chessBoardState.makeMove(Position(1,4,1), Position(2,4,1))
