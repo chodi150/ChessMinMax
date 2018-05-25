@@ -33,92 +33,29 @@ class ChessBoardState(val playerOnePositions : Set[Position],
       chessBoardSort.grouped(8).foreach(x => {x.foreach(y=>print(y.figure+" ")); println("")})
     }
 
-  def generateStatesForKing(position: Position) : Set[ChessBoardState] = {
-    val possibleMoves: Set[Position] = generatePositionsForKing(position)
-      possibleMoves.map(x => makeMove(position, x))
 
-  }
-
-  def generatePositionsForKing(position: Position): Set[Position] = {
-    val pseudoPossibleMoves = Range(position.row - 1, position.row + 2)
-      .flatMap(x => Range(position.col - 1, position.col + 2)
-        .map(y => Position(x, y, 6))).filter(x => x != position && x.positionOnBoard()).toSet
-    val possibleMoves = pseudoPossibleMoves -- playerOnePositions
-    possibleMoves
-  }
-
-  def generateStatesForBishop(position: Position) : Set[ChessBoardState] = {
-    val bishopMoves = generatePositionsForBishop(position)
-    bishopMoves.map(x=>makeMove(position,x))
-  }
-
-  def generatePositionsForBishop(position: Position): Set[Position] = {
-    tryToMoveInDirection(position, 1, 1) ++ tryToMoveInDirection(position, 1, -1) ++ tryToMoveInDirection(position, -1, 1) ++ tryToMoveInDirection(position, -1, -1)
-  }
-
-  def generateStatesForRook(position: Position) : Set[ChessBoardState] = {
-    val rookMoves = generatePositionsForRook(position)
-    rookMoves.map(x=>makeMove(position,x))
-  }
-
-  def generatePositionsForRook(position: Position): Set[Position] = {
-    tryToMoveInDirection(position, 0, 1) ++ tryToMoveInDirection(position, 1, 0) ++ tryToMoveInDirection(position, 0, -1) ++ tryToMoveInDirection(position, -1, 0)
-  }
-
-  def generateStatesForQueen(position: Position) : Set[ChessBoardState] = {
-    generateStatesForBishop(position) ++ generateStatesForRook(position)
-  }
-  def tryToMoveInDirection(position: Position, colMove : Int, rowMove : Int) : Set[Position] = {
-    val newPosition = Position(position.row + colMove, position.col + rowMove, position.figure)
-    if (!newPosition.positionOnBoard())
-      return Set()
-
-    if (playerOnePositions contains newPosition)
-      Set()
-    else if (playerTwoPositions contains newPosition)
-      Set(newPosition)
-    else
-      Set(newPosition) ++ tryToMoveInDirection(newPosition, colMove, rowMove)
-
-  }
-
-
-    def generateStatesForPawn(position: Position) : Set[ChessBoardState] = {
-        val possiblePositions = Set.empty ++ availablePositions.toStream.find(p => p.equalCoords(Position(position.row + 1, position.col, position.figure))).toSet ++ playerTwoPositions.toStream.find(p => p.equalCoords(Position(position.row + 1, position.col+1, position.figure))).toSet ++ playerTwoPositions.toStream.find(p => p.equalCoords(Position(position.row + 1, position.col-1, position.figure))).toSet
-        possiblePositions.map(p => makeMove(position, Position(p.row, p.col, position.figure)))
-    }
 
     def reverseChessBoard(positions: Set[Position]) : Set[Position] = {
       positions.map(p => Position(7-p.row, 7-p.col, p.figure))
     }
 
-    def generateStatesForHorse(position: Position) : Set[ChessBoardState] = {
-      val possibleMoves: Set[Position] = generatePositionsForHorse(position)
-      possibleMoves.map(p => makeMove(position,p))
-    }
 
-  def generatePositionsForHorse(position: Position): Set[Position] = {
-    val horseMove1 = Position(position.row + 2, position.col + 1, position.figure)
-    val horseMove2 = Position(position.row + 2, position.col - 1, position.figure)
-    val horseMove3 = Position(position.row - 2, position.col + 1, position.figure)
-    val horseMove4 = Position(position.row - 2, position.col - 1, position.figure)
-    val horseMove5 = Position(position.row + 1, position.col + 2, position.figure)
-    val horseMove6 = Position(position.row + 1, position.col - 2, position.figure)
-    val horseMove7 = Position(position.row - 1, position.col + 2, position.figure)
-    val horseMove8 = Position(position.row - 1, position.col - 2, position.figure)
-    val pseudoPossibleMoves = Set(horseMove1, horseMove2, horseMove3, horseMove4, horseMove5, horseMove6, horseMove6, horseMove7, horseMove8)
-    val possibleMoves = pseudoPossibleMoves.toStream.filter(p => availablePositions(p) || playerTwoPositions(p)).toSet
-    possibleMoves
+  def generateStatesForPosition(position: Position) : Set[ChessBoardState] =  {
+    val figure:Figure = mapFigure(position.figure)
+    val possiblePositions = figure.generatePositions(position,this)
+    possiblePositions.map(p => makeMove(position,p))
   }
 
-  def generateStatesForPosition(position: Position) : Set[ChessBoardState] =  position.figure match {
-      case 1 => generateStatesForPawn(position)
-      case 2 => generateStatesForHorse(position)
-      case 3 => generateStatesForBishop(position)
-      case 4 => generateStatesForRook(position)
-      case 5 => generateStatesForQueen(position)
-      case 6 => generateStatesForKing(position)
-    }
+  def mapFigure(num:Int):Figure = num match {
+    case 1 => new Pawn()
+    case 2 => new Horse()
+    case 3 => new Bishop()
+    case 4 => new Rook()
+    case 5 => new Queen()
+    case 6 => new King()
+  }
+
+
 
   def countScoreForFigure(figure : Int): Int = figure match {
     case 1 => 1
@@ -137,33 +74,6 @@ class ChessBoardState(val playerOnePositions : Set[Position],
       playerOnePositions.toStream.map(p=>countScoreForFigure(p.figure)).sum - playerTwoPositions.toStream.map(p=>countScoreForFigure(p.figure)).sum
     }
   }
-
- // def nextState(isMaximizingPlayer : Boolean, depth:Int):ChessBoardState = minimax(isMaximizingPlayer, depth)._1
-
-//  def minimax(isMaximizingPlayer : Boolean, depth:Int) : (ChessBoardState, ChessBoardState)  = {
-//    if (depth==0 || isGameOver) {
-//      if (isMaximizingPlayer) {
-//        val bestChild = playerOnePositions.flatMap(p => generateStatesForPosition(p)).reduceLeft((x, y) => if (x.countScoreForChessState(true) > y.countScoreForChessState(true)) x else y)
-//        (this, bestChild)
-//      }
-//      else {
-//        val bestChild = playerOnePositions.flatMap(p => generateStatesForPosition(p)).reduceLeft((x, y) => if (x.countScoreForChessState(false) < y.countScoreForChessState(false)) x else y)
-//        (this,bestChild)
-//      }
-//    }
-//    else{
-//      if (isMaximizingPlayer) {
-//       playerOnePositions.flatMap(p => generateStatesForPosition(p)).map(x => x.minimax(false,depth-1)).
-//          reduceLeft((x,y)=> if(x._2.countScoreForChessState(true) > y._2.countScoreForChessState(true)) x else y)
-//
-//      }
-//      else {
-//        val possibleStates = playerOnePositions.flatMap(p => generateStatesForPosition(p)).map(x => x.minimax(true,depth-1))
-//        possibleStates.reduceLeft((x, y) => if (x._2.countScoreForChessState(false) < y._2.countScoreForChessState(false)) x else y)
-//
-//      }
-//    }
-//  }
 
   def nextState(isMaximizingPlayer : Boolean, depth:Int):ChessBoardState = {
     val allChildren = allPossibleUpcomingStates
@@ -247,15 +157,5 @@ class ChessBoardState(val playerOnePositions : Set[Position],
 
   }
 
-
-//  def alphaBeta(isMaximizingPlayer:Boolean, depth:Int, alpha:Int, beta:Int) : (ChessBoardState, Int) = {
-//    if(depth ==0 || isGameOver){
-//      (this,countScoreForChessState(isMaximizingPlayer))
-//    }
-//    if(isMaximizingPlayer){
-//
-//    }
-//
-//  }
 }
 

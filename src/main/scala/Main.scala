@@ -32,6 +32,7 @@ object Main extends App{
   }
 
 
+
   var state = new ChessBoardState(initPlayerOnePositions(),initPlayerTwoPositions(),initAvailablePositions())
 
   while(!state.isGameOver){
