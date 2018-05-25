@@ -25,7 +25,7 @@ class ChessBoardState(val playerOnePositions : Set[Position],
   }
 
   def isValidMove(p1: Position, p2: Position): Boolean = {
-      if(p1.figure != p2.figure || !playerOnePositions.contains(p1)){
+      if(p1.field != p2.field || !playerOnePositions.contains(p1)){
         return false
       }
       val possibleStates = generateStatesForPosition(p1)
