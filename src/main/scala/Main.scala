@@ -37,6 +37,7 @@ object Main extends App{
 
   def play(chessBoardState: ChessBoardState, playedComputer: Boolean) : Boolean = {
     if(chessBoardState.isGameOver){
+      chessBoardState.display(playedComputer)
       println("Player wins: " + !playedComputer)
       return true
     }
@@ -53,58 +54,41 @@ object Main extends App{
   }
 
   private def userMakeMove(chessBoardState: ChessBoardState) : ChessBoardState = {
-    println("Enter type of your figure to move")
-    val figure1 = readTypeOfFigure()
     println("Enter row of your figure to move")
-    val row1 = readRow()
+    val row1 = readInt()
     println("Enter column of your figure to move")
-    val col1 = readColumn()
+    val col1 = readInt()
     println("Enter row where you want to move")
-    val row2 = readRow()
+    val row2 = readInt()
     println("Enter column where you want to move")
-    val col2 = readColumn()
-    val p1 = Position(row1, col1, figure1)
-    val p2 = Position(row2, col2, figure1)
-    if(chessBoardState.isValidMove(p1,p2))
-      chessBoardState.makeMove(p1,p2)
+    val col2 = readInt()
+    val isValidPosition = chessBoardState.playerOnePositions.map(p => p.col==col1 && p.row==row1)
+    if(isValidPosition contains true){
+      val position = chessBoardState.playerOnePositions.filter(p => p.col==col1 && p.row==row1).head
+      val p1 = Position(row1, col1, position.field)
+      val p2 = Position(row2, col2, position.field)
+      if(chessBoardState.isValidMove(p1,p2)){
+        chessBoardState.makeMove(p1,p2)
+      }
+      else{
+        println("INVALID MOVE!!!!!")
+        userMakeMove(chessBoardState)
+      }
+    }
     else{
-      println("INVALID MOVE!!!!!")
+      println("YOU DON'T HAVE A FIGURE AT THIS FIELD!!!!!")
       userMakeMove(chessBoardState)
     }
-
-
   }
 
-  def readRow() : Int = {
+  def readInt() : Int = {
     val input = scala.io.StdIn.readLine()
     if(Try(input.toInt).isSuccess && input.toInt>=0 && input.toInt<=7){
       input.toInt
     }
     else {
-      println("Incorrect row")
-      readRow()
-    }
-  }
-
-  def readColumn() : Int = {
-    val input = scala.io.StdIn.readLine()
-    if(Try(input.toInt).isSuccess && input.toInt>=0 && input.toInt<=7){
-      input.toInt
-    }
-    else {
-      println("Incorrect column")
-      readRow()
-    }
-  }
-
-  def readTypeOfFigure() : Int = {
-    val input = scala.io.StdIn.readLine()
-    if(Try(input.toInt).isSuccess && input.toInt>=1 && input.toInt<=6){
-      input.toInt
-    }
-    else {
-      println("Incorrect type of figure")
-      readTypeOfFigure()
+      println("Incorrect number")
+      readInt()
     }
   }
 

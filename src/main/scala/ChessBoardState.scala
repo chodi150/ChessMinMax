@@ -25,9 +25,6 @@ class ChessBoardState(val playerOnePositions : Set[Position],
   }
 
   def isValidMove(p1: Position, p2: Position): Boolean = {
-      if(p1.field != p2.field || !playerOnePositions.contains(p1)){
-        return false
-      }
       val possibleStates = generateStatesForPosition(p1)
       val potentialNextState = makeMove(p1,p2)
       val x = possibleStates.map(f => f.equals(potentialNextState))
@@ -44,7 +41,7 @@ class ChessBoardState(val playerOnePositions : Set[Position],
          chessBoard = availablePositions.map(p => Position(p.row,p.col,p.field)) ++ playerTwoPositions.map(p => Position(p.row, p.col, p.field)) ++ playerOnePositions.map(p => Position(p.row,p.col,p.field))
       }
       val chessBoardSort = collection.immutable.SortedSet[Position]() ++ chessBoard
-      //chessBoardSort.grouped(8).foreach(x => {x.foreach(y=>print(y.field" ")); println("")}) TODO
+      chessBoardSort.grouped(8).foreach(x => {x.foreach(y=>print(y.field.displayValue+" ")); println("")})
     }
 
 
