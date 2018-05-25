@@ -13,14 +13,15 @@ class ChessBoardState(val playerOnePositions : Set[Position],
   def makeMove(p1: Position, p2: Position): ChessBoardState = {
       val p = playerTwoPositions.toStream.find(p => p.equalCoords(p2)).orNull
       if (p != null) {
-        new ChessBoardState(reverseChessBoard(playerTwoPositions - p),reverseChessBoard(playerOnePositions - p1 + p2), reverseChessBoard(availablePositions + Position(p1.row, p1.col, 0)))
+        new ChessBoardState(reversePositions(playerTwoPositions - p),reversePositions(playerOnePositions - p1 + p2), reversePositions(availablePositions + Position(p1.row, p1.col, 0)))
       }
       else {
-        new ChessBoardState(reverseChessBoard(playerTwoPositions),reverseChessBoard(playerOnePositions - p1 + p2), reverseChessBoard(availablePositions + Position(p1.row, p1.col, 0) - p2))
+        new ChessBoardState(reversePositions(playerTwoPositions),reversePositions(playerOnePositions - p1 + p2), reversePositions(availablePositions + Position(p1.row, p1.col, 0) - p2))
       }
   }
 
     def display(playedComputer:Boolean): Unit = {
+      println("*****************************")
       var chessBoard:Set[Position] = Set()
       if(playedComputer){
          chessBoard = availablePositions.map(p => Position(p.row,p.col,p.figure+99)) ++ playerTwoPositions.map(p => Position(p.row, p.col, -p.figure)) ++ playerOnePositions.map(p => Position(p.row,p.col,p.figure*10))
@@ -28,17 +29,27 @@ class ChessBoardState(val playerOnePositions : Set[Position],
       else{
          chessBoard = availablePositions.map(p => Position(p.row,p.col,p.figure+99)) ++ playerTwoPositions.map(p => Position(p.row, p.col, 10*p.figure)) ++ playerOnePositions.map(p => Position(p.row,p.col,-p.figure))
       }
-     // val chessBoard = availablePositions.map(p => Position(p.row,p.col,p.figure+99)) ++ playerTwoPositions.map(p => Position(p.row, p.col, -p.figure)) ++ playerOnePositions.map(p => Position(p.row,p.col,p.figure*10))
       val chessBoardSort = collection.immutable.SortedSet[Position]() ++ chessBoard
       chessBoardSort.grouped(8).foreach(x => {x.foreach(y=>print(y.figure+" ")); println("")})
     }
 
 
 
-    def reverseChessBoard(positions: Set[Position]) : Set[Position] = {
+    def reversePositions(positions: Set[Position]) : Set[Position] = {
       positions.map(p => Position(7-p.row, 7-p.col, p.figure))
     }
 
+    def reverseChessBoardState() : ChessBoardState = {
+      val playerOneNewPositions = reversePositions(playerTwoPositions)
+      val playerTwoNewPositions = reversePositions(playerOnePositions)
+      val newAvailablePositions = reversePositions(availablePositions)
+      new ChessBoardState(playerOneNewPositions, playerTwoNewPositions, newAvailablePositions)
+    }
+
+    def generateStatesForHorse(position: Position) : Set[ChessBoardState] = {
+      val possibleMoves: Set[Position] = generatePositionsForHorse(position)
+      possibleMoves.map(p => makeMove(position,p))
+    }
 
   def generateStatesForPosition(position: Position) : Set[ChessBoardState] =  {
     val figure:Figure = mapFigure(position.figure)
@@ -109,9 +120,9 @@ class ChessBoardState(val playerOnePositions : Set[Position],
       }
     }
   }
-  def nextStateAB(isMaximizingPlayer : Boolean, depth:Int):ChessBoardState = {
+  def nextStateAlphaBeta(isMaximizingPlayer : Boolean, depth:Int):ChessBoardState = {
     val allChildren = playerOnePositions.flatMap(p => generateStatesForPosition(p))
-    val allChildrenScores = allChildren.map(x => x.alphabeta(isMaximizingPlayer, depth -1, -2000,2000))
+    val allChildrenScores = allChildren.map(x => x.alphaBeta(isMaximizingPlayer, depth -1, -2000,2000))
     if (isMaximizingPlayer) {
       val bestStateTuple = allChildrenScores.reduceLeft((x, y) => if (x._2 > y._2) x else y)
       bestStateTuple._1
@@ -120,40 +131,40 @@ class ChessBoardState(val playerOnePositions : Set[Position],
       bestStateTuple._1
     }
   }
-  def alphabeta(isMaximizingPlayer : Boolean, depth:Int, a:Int, b:Int) : (ChessBoardState, Int) = {
+  def alphaBeta(isMaximizingPlayer : Boolean, depth:Int, a:Int, b:Int) : (ChessBoardState, Int) = {
     if (depth<=0 || isGameOver) {
       (this, countScoreForChessState(isMaximizingPlayer))
     }
     else {
       if (isMaximizingPlayer) {
-        take_min(playerOnePositions.flatMap(p => generateStatesForPosition(p)), depth, a, b, 2000)
+        takeMin(playerOnePositions.flatMap(p => generateStatesForPosition(p)), depth, a, b, 2000)
       }
       else {
-        take_max(playerOnePositions.flatMap(p => generateStatesForPosition(p)), depth, a, b, -2000)
+        takeMax(playerOnePositions.flatMap(p => generateStatesForPosition(p)), depth, a, b, -2000)
       }
     }
   }
 
-  def take_max(children:Set[ChessBoardState], depth:Int, a:Int, b:Int, v_val:Int): (ChessBoardState, Int) ={
+  def takeMax(children:Set[ChessBoardState], depth:Int, a:Int, b:Int, v_val:Int): (ChessBoardState, Int) ={
     val v:(ChessBoardState, Int) = (this,v_val)
-    val ab = children.head.alphabeta(true, depth-1, a,b)
-    val new_v = if(v._2 > ab._2) v else ab
-    val new_a = if(new_v._2 > a) new_v._2 else a
-    if(b <= new_a || children.tail.isEmpty)
-      (this,new_v._2)
+    val ab = children.head.alphaBeta(isMaximizingPlayer = true, depth-1, a,b)
+    val newV = if(v._2 > ab._2) v else ab
+    val newA = if(newV._2 > a) newV._2 else a
+    if(b <= newA || children.tail.isEmpty)
+      (this,newV._2)
     else
-      take_max(children.tail, depth, new_a, b, new_v._2)
+      takeMax(children.tail, depth, newA, b, newV._2)
   }
 
-  def take_min(children:Set[ChessBoardState], depth:Int, a:Int, b:Int, v_val:Int): (ChessBoardState, Int) = {
+  def takeMin(children:Set[ChessBoardState], depth:Int, a:Int, b:Int, v_val:Int): (ChessBoardState, Int) = {
     val v:(ChessBoardState, Int) = (this,v_val)
-    val ab = children.head.alphabeta(false, depth-1, a,b)
-    val new_v = if(v._2 < ab._2) v else ab
-    val new_b = if(new_v._2 < b) new_v._2 else b
-    if(new_b <= a || children.tail.isEmpty)
-      (this,new_v._2)
+    val ab = children.head.alphaBeta(isMaximizingPlayer = false, depth-1, a,b)
+    val newV = if(v._2 < ab._2) v else ab
+    val newB = if(newV._2 < b) newV._2 else b
+    if(newB <= a || children.tail.isEmpty)
+      (this,newV._2)
     else
-      take_min(children.tail, depth, a, new_b, new_v._2)
+      takeMin(children.tail, depth, a, newB, newV._2)
 
   }
 

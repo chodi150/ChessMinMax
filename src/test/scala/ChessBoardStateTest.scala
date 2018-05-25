@@ -191,19 +191,19 @@ class ChessBoardStateTest extends FunSuite {
     val state1 = initialStateOfGame.makeMove(Position(0,1,2), Position(5,2,2))
     val state2 = state1.makeMove(Position(1,1,1), Position(1,1,1))
     val state3 = state2.makeMove(Position(0,6,2), Position(5,5,2))
-    val state4 = state3.nextStateAB(true, 4)
+    val state4 = state3.nextStateAlphaBeta(true, 4)
     assert(state4.playerTwoPositions(Position(5,5,1)))
   }
   test("depth 1 - if is able to smash then does it 0 ALPHA BETTTTA") {
     val chessBoardState = new ChessBoardState(initPlayerOnePositions(),initPlayerTwoPositions(),initAvailablePositions())
     val chessBoardState2 = chessBoardState.makeMove(Position(1,0,1), Position(5,0,1))
-    val chessBoardState3 = chessBoardState2.nextStateAB(true, 1)
+    val chessBoardState3 = chessBoardState2.nextStateAlphaBeta(true, 1)
     assert(!chessBoardState3.playerOnePositions.contains(Position(5,0,1)))
   }
   test("depth 1 - if is able to smash then does it 1 ALPHA BETTTTA") {
     val chessBoardState = new ChessBoardState(initPlayerOnePositions(),initPlayerTwoPositions(),initAvailablePositions())
     val chessBoardState2 = chessBoardState.makeMove(Position(1,1,1), Position(5,1,1))
-    val chessBoardState3 = chessBoardState2.nextStateAB(true, 1)
+    val chessBoardState3 = chessBoardState2.nextStateAlphaBeta(true, 1)
     assert(!chessBoardState3.playerOnePositions.contains(Position(5,1,1)))
   }
 
@@ -212,7 +212,7 @@ class ChessBoardStateTest extends FunSuite {
     val state2 = chessBoardState.makeMove(Position(0, 2, 3), Position(4, 7, 3))
     val state3 = state2.makeMove(Position(1, 2, 1), Position(2, 2, 1))
     val state4 = state3.makeMove(Position(1, 1, 1), Position(2, 1, 1))
-    val state5 = state4.nextStateAB(true, 4)
+    val state5 = state4.nextStateAlphaBeta(true, 4)
     assert(state5.playerTwoPositions.contains(Position(5, 6, 1)))
   }
 
@@ -230,7 +230,7 @@ class ChessBoardStateTest extends FunSuite {
     val state2 = chessBoardState.makeMove(Position(0, 2, 3), Position(4, 7, 3))
     val state3 = state2.makeMove(Position(1, 2, 1), Position(2, 2, 1))
     val state4 = state3.makeMove(Position(1, 1, 1), Position(2, 1, 1))
-    val state5 = state4.nextStateAB(true, 2)
+    val state5 = state4.nextStateAlphaBeta(true, 2)
     assert(state5.playerTwoPositions.contains(Position(5, 6, 1)))
   }
 
@@ -248,7 +248,7 @@ class ChessBoardStateTest extends FunSuite {
     val state0 = initialStateOfGame.makeMove(Position(1,1,1), Position(1,1,1))
     val state1 = state0.makeMove(Position(0,4,5), Position(6,3,5))
     val state2 = state1.makeMove(Position(0,3,5), Position(6,4,5))
-    val state3 = state2.nextStateAB(true, 1)
+    val state3 = state2.nextStateAlphaBeta(true, 1)
     assert(state3.playerTwoPositions.contains(Position(0,4,5)))
   }
 
