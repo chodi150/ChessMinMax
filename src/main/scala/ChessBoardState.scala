@@ -12,7 +12,7 @@ class ChessBoardState(val playerOnePositions : Set[Position],
     this.playerOnePositions==obj.playerOnePositions && this.playerTwoPositions==obj.playerTwoPositions && this.availablePositions==obj.availablePositions
   }
 
-  def checkLose(positions: Set[Position]): Boolean = !positions.toStream.exists(p => p.field.getClass==classOf[King]) //TODO nieladne
+  def checkLose(positions: Set[Position]): Boolean = !positions.toStream.exists(p => p.field.getClass==classOf[King])
 
   def makeMove(p1: Position, p2: Position): ChessBoardState = {
       val p = playerTwoPositions.toStream.find(p => p.equalCoords(p2)).orNull
@@ -33,15 +33,15 @@ class ChessBoardState(val playerOnePositions : Set[Position],
 
     def display(playedComputer:Boolean): Unit = {
       println("*****************************")
-      var chessBoard:Set[Position] = Set()
+      var chessBoard:Set[DisplayablePosition] = Set()
       if(playedComputer){
-         chessBoard = availablePositions.map(p => Position(p.row,p.col,p.field)) ++ playerTwoPositions.map(p => Position(p.row, p.col, p.field)) ++ playerOnePositions.map(p => Position(p.row,p.col,p.field))
+         chessBoard = availablePositions.map(p => DisplayablePosition(p,true)) ++ playerTwoPositions.map(p => DisplayablePosition(p,false)) ++ playerOnePositions.map(p => DisplayablePosition(p,true))
       }
       else{
-         chessBoard = availablePositions.map(p => Position(p.row,p.col,p.field)) ++ playerTwoPositions.map(p => Position(p.row, p.col, p.field)) ++ playerOnePositions.map(p => Position(p.row,p.col,p.field))
+         chessBoard = availablePositions.map(p => DisplayablePosition(p,true)) ++ playerTwoPositions.map(p => DisplayablePosition(p,true)) ++ playerOnePositions.map(p => DisplayablePosition(p,false))
       }
-      val chessBoardSort = collection.immutable.SortedSet[Position]() ++ chessBoard
-      chessBoardSort.grouped(8).foreach(x => {x.foreach(y=>print(y.field.displayValue+" ")); println("")})
+      val chessBoardSort = collection.immutable.SortedSet[DisplayablePosition]() ++ chessBoard
+      chessBoardSort.grouped(8).foreach(x => {x.foreach(y=>print(y.getDisplayedValue +  " ")); println("")})
     }
 
 
@@ -57,27 +57,17 @@ class ChessBoardState(val playerOnePositions : Set[Position],
       new ChessBoardState(playerOneNewPositions, playerTwoNewPositions, newAvailablePositions)
     }
 
-  def generateStatesForPosition(position: Position) : Set[ChessBoardState] =  {
-    val figure:Figure = position.field.asInstanceOf[Figure] //TODO poprawic bo gowno
-    val possiblePositions = figure.generatePositions(position,this)
-    possiblePositions.map(p => makeMove(position,p))
+  def generateStatesForPosition(position: Position) : Set[ChessBoardState] = position.field match {
+    case figure : Figure => figure.generatePositions(position,this).map( p => makeMove(position, p))
+    case _ : Field => throw new RuntimeException("Can't generate positions for field")
 
   }
 
-  def mapFigure(num:Int):Figure = num match {
-    case 1 => new Pawn()
-    case 2 => new Horse()
-    case 3 => new Bishop()
-    case 4 => new Rook()
-    case 5 => new Queen()
-    case 6 => new King()
+  def countScoreForFigure(field : Field): Int = field match {
+    case figure :Figure => figure.value
+    case field : Field => throw new RuntimeException("Can't calculate score for field")
   }
 
-
-
-  def countScoreForFigure(field : Field): Int =  {
-    field.asInstanceOf[Figure].value
-  }
 
   def countScoreForChessState(isMaximizingPlayer: Boolean) : Int = {
     if(isMaximizingPlayer){
