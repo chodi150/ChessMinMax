@@ -38,12 +38,12 @@ class ChessBoardState(val playerOnePositions : Set[Position],
     def display(playedComputer:Boolean): Unit = {
       println("*****************************")
       if(playedComputer){
-        val chessBoard = availablePositions.map(p => DisplayablePosition(p,true)) ++ playerTwoPositions.map(p => DisplayablePosition(p,true)) ++ playerOnePositions.map(p => DisplayablePosition(p,false))
+        val chessBoard = availablePositions.map(p => DisplayablePosition(p,computerFigure = true)) ++ playerTwoPositions.map(p => DisplayablePosition(p,computerFigure = true)) ++ playerOnePositions.map(p => DisplayablePosition(p,computerFigure = false))
         val chessBoardSort = collection.immutable.SortedSet[DisplayablePosition]() ++ chessBoard
         chessBoardSort.grouped(8).foreach(x => {x.foreach(y=>print(y.getDisplayedValue +  " ")); println("")})
       }
       else{
-        val chessBoard = availablePositions.map(p => DisplayablePosition(p,true)) ++ playerTwoPositions.map(p => DisplayablePosition(p,false)) ++ playerOnePositions.map(p => DisplayablePosition(p,true))
+        val chessBoard = availablePositions.map(p => DisplayablePosition(p,computerFigure = true)) ++ playerTwoPositions.map(p => DisplayablePosition(p,computerFigure = false)) ++ playerOnePositions.map(p => DisplayablePosition(p,computerFigure = true))
         val chessBoardSort = collection.immutable.SortedSet[DisplayablePosition]() ++ chessBoard
         chessBoardSort.grouped(8).foreach(x => {x.foreach(y=>print(y.getDisplayedValue +  " ")); println("")})
       }

@@ -48,12 +48,12 @@ object Main extends App{
     if(playedComputer){
       chessBoardState.display(playedComputer)
       val nextState: ChessBoardState = userMakeMove(chessBoardState)
-      play(nextState, false)
+      play(nextState, playedComputer = false)
     }
     else{
       val reversedChessBoardState = chessBoardState.reverseChessBoardState()
       reversedChessBoardState.display(!playedComputer)
-      play(chessBoardState.nextStateAlphaBeta(true, 4), true)
+      play(chessBoardState.nextStateAlphaBeta(isMaximizingPlayer = true, 4), playedComputer = true)
     }
   }
 
@@ -97,24 +97,7 @@ object Main extends App{
   }
 
   val initialState = new ChessBoardState(initPlayerOnePositions(),initPlayerTwoPositions(),initAvailablePositions())
-  play(initialState, true)
-
-
-//  while(!state.isGameOver){
-//    state.display(true)
-//    println("Enter your which figure to move")
-//    val (row1, col1, figure1: Any) = readf3("{0, number} {1,number} {2,number}")
-//    println("Enter where to move your figure")
-//    val (row2, col2, figure2) = readf3("{0, number} {1,number} {2,number}")
-//    state = state.makeMove(position.Position(row1.asInstanceOf[Long].toInt,col1.asInstanceOf[Long].toInt,figure1.asInstanceOf[Long].toInt),position.Position(row2.asInstanceOf[Long].toInt,col2.asInstanceOf[Long].toInt,figure2.asInstanceOf[Long].toInt))
-//    state = state.nextStateAlphaBeta(true, 4)
-//  }
-
-//  val chessBoardState = chessBoardState1.makeMove(position.Position(1,1,1), position.Position(5,1,1))
-//  val chessBoardState2 = chessBoardState.makeMove(position.Position(1,4,1), position.Position(2,4,1))
-//  val chessBoardState3 = chessBoardState2.makeMove(position.Position(0,4,6), position.Position(7,4,6))
-//  chessBoardState3.display()
-//  print(chessBoardState3.isGameOver)
+  play(initialState, playedComputer = true)
 
 
 }
