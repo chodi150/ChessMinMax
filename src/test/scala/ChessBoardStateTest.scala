@@ -1,5 +1,8 @@
 import Main.{initAvailablePositions, initPlayerOnePositions, initPlayerTwoPositions}
+import figure._
 import org.scalatest.FunSuite
+import position.Position
+import state.ChessBoardState
 
 class ChessBoardStateTest extends FunSuite {
 
@@ -106,53 +109,42 @@ class ChessBoardStateTest extends FunSuite {
     assert(15==chessBoardState.generateStatesForPosition(p).size)
   }
 
-  test("King in proper position in initial state of game") {
+  test("figure.King in proper position in initial state of game") {
     val positionOfKing = initialStateOfGame.playerOnePositions.filter(p => p.field.getClass==classOf[King]).head
     assert(positionOfKing.row == 0 && positionOfKing.col == 4)
   }
 
-//  test("King has no possible moves in start positions") {
-//    val positionOfKing = initialStateOfGame.playerOnePositions.filter(p => p.figure == 6).head
-//    assert(0 == initialStateOfGame.generateStatesForKing(positionOfKing).size)
-//  }
-//  test("initial position, besides King staying in row 5, can beat 2 pawns or choose different 6 positions") {
-//    val positionOfKing = Position(5,4,new King())
-//    assert(8 == initialStateOfGame.generateStatesForKing(positionOfKing).size)
-//  }
-//
-//  test("initial position, besides King staying in row 4, col 7, has 5 moves (all - 3 out of board)") {
-//    val positionOfKing = Position(5,7,new King())
-//    val correctPossibilities = Set.empty + Position(6,7,new King()) + Position(6,6,new King()) + Position(5,6,new King()) + Position(4,6,new King()) + Position(4,7,new King())
-//    assert(5 == initialStateOfGame.generateStatesForKing(positionOfKing).size)
-//    assert((initialStateOfGame.generatePositionsForKing(positionOfKing) -- correctPossibilities).isEmpty )
-//  }
-//
-//  test("Horses in proper positions in initial state"){
-//    val positonOfHorses = initialStateOfGame.playerOnePositions.filter(p => p.figure == 2)
-//    val properPositions = Set(Position(0,1,new Horse()), Position(0,6,new Horse()))
-//    assert((positonOfHorses -- properPositions).isEmpty)
-//  }
-//  test("Horses in initial states, both can go to two positions"){
-//    val positonOfHorses = initialStateOfGame.playerOnePositions.filter(p => p.figure == 2)
-//    val moves = positonOfHorses.map(x => initialStateOfGame.generateStatesForHorse(x)).toList
-//    assert(moves(0).size ==2)
-//    assert(moves(1).size ==2 )
-//  }
-//  test("Initial state besides horse in row 5, col 7, has 3 moves"){
-//    val moves = initialStateOfGame.generatePositionsForHorse(Position(5,7,new Horse()))
-//    val properPositions = Set(Position(7,6,new Horse()), Position(6,5,new Horse()), Position(4,5,new Horse()), Position(3,6,new Horse()))
-//    assert((moves--properPositions).isEmpty)
-//  }
-//  test("Bishops can't move in initial state") {
-//    val positonOfBishop = initialStateOfGame.playerOnePositions.filter(p => p.figure ==3)
-//    val moves = positonOfBishop.flatMap(x => initialStateOfGame.generateStatesForBishop(x))
-//    assert(moves.isEmpty)
-//  }
-//  test("Bishop in the middle can move to 10 fields") {
-//    val positionOfBishop = Position(4,4,new Bishop())
-//    val moves = initialStateOfGame.generateStatesForBishop(positionOfBishop)
-//    assert(moves.size == 8)
-//  }
+  test("figure.King has no possible moves in start positions") {
+    val positionOfKing = initialStateOfGame.playerOnePositions.filter(p => p.field.getClass == classOf[King]).head
+    assert(0 == initialStateOfGame.generateStatesForPosition(positionOfKing).size)
+  }
+  test("initial position, besides figure.King staying in row 5, can beat 2 pawns or choose different 6 positions") {
+    val positionOfKing = Position(5,4,new King())
+    assert(8 == initialStateOfGame.generateStatesForPosition(positionOfKing).size)
+  }
+
+  test("Horses in proper positions in initial state"){
+    val positonOfHorses = initialStateOfGame.playerOnePositions.filter(p => p.field.getClass == classOf[Horse])
+    val properPositions = Set(Position(0,1,new Horse()), Position(0,6,new Horse()))
+    assert((positonOfHorses -- properPositions).isEmpty)
+  }
+  test("Horses in initial states, both can go to two positions"){
+    val positonOfHorses = initialStateOfGame.playerOnePositions.filter(p => p.field.getClass == classOf[Horse])
+    val moves = positonOfHorses.map(x => initialStateOfGame.generateStatesForPosition(x)).toList
+    assert(moves(0).size ==2)
+    assert(moves(1).size ==2 )
+  }
+
+  test("Bishops can't move in initial state") {
+    val positonOfBishop = initialStateOfGame.playerOnePositions.filter(p => p.field.getClass == classOf[Bishop])
+    val moves = positonOfBishop.flatMap(x => initialStateOfGame.generateStatesForPosition(x))
+    assert(moves.isEmpty)
+  }
+  test("figure.Bishop in the middle can move to 10 fields") {
+    val positionOfBishop = Position(4,4,new Bishop())
+    val moves = initialStateOfGame.generateStatesForPosition(positionOfBishop)
+    assert(moves.size == 8)
+  }
 
   test("Initial state has score of 0") {
     assert(initialStateOfGame.countScoreForChessState(true) == 0)
@@ -167,7 +159,7 @@ class ChessBoardStateTest extends FunSuite {
     val p = Position(0,3,new Queen())
   }
 
-  test("Queen and king in danger, CPU saves king"){
+  test("figure.Queen and king in danger, CPU saves king"){
     val state1 = initialStateOfGame.makeMove(Position(0,1,new Horse()), Position(5,2,new Horse()))
     val state2 = state1.makeMove(Position(1,1,new Pawn()), Position(1,1,new Pawn()))
     val state3 = state2.makeMove(Position(0,6,new Horse()), Position(5,5,new Horse()))
@@ -187,7 +179,7 @@ class ChessBoardStateTest extends FunSuite {
     assert(!chessBoardState3.playerOnePositions.contains(Position(5,1,new Pawn())))
   }
 
-  test("Queen and king in danger, CPU saves king ALPHA BETTTTA"){
+  test("figure.Queen and king in danger, CPU saves king ALPHA BETTTTA"){
     val state1 = initialStateOfGame.makeMove(Position(0,1,new Horse()), Position(5,2,new Horse()))
     val state2 = state1.makeMove(Position(1,1,new Pawn()), Position(1,1,new Pawn()))
     val state3 = state2.makeMove(Position(0,6,new Horse()), Position(5,5,new Horse()))

@@ -1,4 +1,10 @@
+package position
 
+import figure.Field
+
+/**
+  * Created by Piotr on 26.05.2018.
+  */
 case class Position(row: Int, col: Int, field: Field) extends Ordered[Position]{
   override def compare(that: Position): Int = {
     if (this.col==that.col && this.row==that.row)
@@ -19,4 +25,3 @@ case class Position(row: Int, col: Int, field: Field) extends Ordered[Position]{
 
   def positionOnBoard():Boolean = row<8 && row>=0 && col<8 && col>=0
 }
-

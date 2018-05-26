@@ -1,3 +1,7 @@
+package state
+
+import figure._
+import position.{DisplayablePosition, Position}
 
 class ChessBoardState(val playerOnePositions : Set[Position],
                       val playerTwoPositions : Set[Position],
@@ -33,15 +37,16 @@ class ChessBoardState(val playerOnePositions : Set[Position],
 
     def display(playedComputer:Boolean): Unit = {
       println("*****************************")
-      var chessBoard:Set[DisplayablePosition] = Set()
       if(playedComputer){
-         chessBoard = availablePositions.map(p => DisplayablePosition(p,true)) ++ playerTwoPositions.map(p => DisplayablePosition(p,true)) ++ playerOnePositions.map(p => DisplayablePosition(p,false))
+        val chessBoard = availablePositions.map(p => DisplayablePosition(p,true)) ++ playerTwoPositions.map(p => DisplayablePosition(p,true)) ++ playerOnePositions.map(p => DisplayablePosition(p,false))
+        val chessBoardSort = collection.immutable.SortedSet[DisplayablePosition]() ++ chessBoard
+        chessBoardSort.grouped(8).foreach(x => {x.foreach(y=>print(y.getDisplayedValue +  " ")); println("")})
       }
       else{
-         chessBoard = availablePositions.map(p => DisplayablePosition(p,true)) ++ playerTwoPositions.map(p => DisplayablePosition(p,false)) ++ playerOnePositions.map(p => DisplayablePosition(p,true))
+        val chessBoard = availablePositions.map(p => DisplayablePosition(p,true)) ++ playerTwoPositions.map(p => DisplayablePosition(p,false)) ++ playerOnePositions.map(p => DisplayablePosition(p,true))
+        val chessBoardSort = collection.immutable.SortedSet[DisplayablePosition]() ++ chessBoard
+        chessBoardSort.grouped(8).foreach(x => {x.foreach(y=>print(y.getDisplayedValue +  " ")); println("")})
       }
-      val chessBoardSort = collection.immutable.SortedSet[DisplayablePosition]() ++ chessBoard
-      chessBoardSort.grouped(8).foreach(x => {x.foreach(y=>print(y.getDisplayedValue +  " ")); println("")})
     }
 
 
@@ -137,26 +142,26 @@ class ChessBoardState(val playerOnePositions : Set[Position],
     }
   }
 
-  def takeMax(children:Set[ChessBoardState], depth:Int, a:Int, b:Int, v_val:Int): (ChessBoardState, Int) ={
-    val v:(ChessBoardState, Int) = (this,v_val)
-    val ab = children.head.alphaBeta(isMaximizingPlayer = true, depth-1, a,b)
+  def takeMax(children:Set[ChessBoardState], depth:Int, alpha:Int, beta:Int, valueV:Int): (ChessBoardState, Int) ={
+    val v:(ChessBoardState, Int) = (this,valueV)
+    val ab = children.head.alphaBeta(isMaximizingPlayer = true, depth-1, alpha,beta)
     val newV = if(v._2 > ab._2) v else ab
-    val newA = if(newV._2 > a) newV._2 else a
-    if(b <= newA || children.tail.isEmpty)
+    val newA = if(newV._2 > alpha) newV._2 else alpha
+    if(beta <= newA || children.tail.isEmpty)
       (this,newV._2)
     else
-      takeMax(children.tail, depth, newA, b, newV._2)
+      takeMax(children.tail, depth, newA, beta, newV._2)
   }
 
-  def takeMin(children:Set[ChessBoardState], depth:Int, a:Int, b:Int, v_val:Int): (ChessBoardState, Int) = {
-    val v:(ChessBoardState, Int) = (this,v_val)
-    val ab = children.head.alphaBeta(isMaximizingPlayer = false, depth-1, a,b)
+  def takeMin(children:Set[ChessBoardState], depth:Int, alpha:Int, beta:Int, valueV:Int): (ChessBoardState, Int) = {
+    val v:(ChessBoardState, Int) = (this,valueV)
+    val ab = children.head.alphaBeta(isMaximizingPlayer = false, depth-1, alpha,beta)
     val newV = if(v._2 < ab._2) v else ab
-    val newB = if(newV._2 < b) newV._2 else b
-    if(newB <= a || children.tail.isEmpty)
+    val newB = if(newV._2 < beta) newV._2 else beta
+    if(newB <= alpha || children.tail.isEmpty)
       (this,newV._2)
     else
-      takeMin(children.tail, depth, a, newB, newV._2)
+      takeMin(children.tail, depth, alpha, newB, newV._2)
 
   }
 

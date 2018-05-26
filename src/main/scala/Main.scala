@@ -1,3 +1,7 @@
+import figure._
+import position.Position
+import state.ChessBoardState
+
 import scala.util.Try
 
 /**
@@ -102,13 +106,13 @@ object Main extends App{
 //    val (row1, col1, figure1: Any) = readf3("{0, number} {1,number} {2,number}")
 //    println("Enter where to move your figure")
 //    val (row2, col2, figure2) = readf3("{0, number} {1,number} {2,number}")
-//    state = state.makeMove(Position(row1.asInstanceOf[Long].toInt,col1.asInstanceOf[Long].toInt,figure1.asInstanceOf[Long].toInt),Position(row2.asInstanceOf[Long].toInt,col2.asInstanceOf[Long].toInt,figure2.asInstanceOf[Long].toInt))
+//    state = state.makeMove(position.Position(row1.asInstanceOf[Long].toInt,col1.asInstanceOf[Long].toInt,figure1.asInstanceOf[Long].toInt),position.Position(row2.asInstanceOf[Long].toInt,col2.asInstanceOf[Long].toInt,figure2.asInstanceOf[Long].toInt))
 //    state = state.nextStateAlphaBeta(true, 4)
 //  }
 
-//  val chessBoardState = chessBoardState1.makeMove(Position(1,1,1), Position(5,1,1))
-//  val chessBoardState2 = chessBoardState.makeMove(Position(1,4,1), Position(2,4,1))
-//  val chessBoardState3 = chessBoardState2.makeMove(Position(0,4,6), Position(7,4,6))
+//  val chessBoardState = chessBoardState1.makeMove(position.Position(1,1,1), position.Position(5,1,1))
+//  val chessBoardState2 = chessBoardState.makeMove(position.Position(1,4,1), position.Position(2,4,1))
+//  val chessBoardState3 = chessBoardState2.makeMove(position.Position(0,4,6), position.Position(7,4,6))
 //  chessBoardState3.display()
 //  print(chessBoardState3.isGameOver)
 

@@ -1,3 +1,5 @@
+package figure
+
 /**
   * Created by Piotr on 25.05.2018.
   */

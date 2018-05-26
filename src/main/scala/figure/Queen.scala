@@ -1,3 +1,8 @@
+package figure
+
+import position.Position
+import state.ChessBoardState
+
 /**
   * Created by Piotr on 25.05.2018.
   */
